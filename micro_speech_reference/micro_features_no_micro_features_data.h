@@ -13,7 +13,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "constants.h"
+#ifndef TENSORFLOW_LITE_MICRO_EXAMPLES_MICRO_SPEECH_MICRO_FEATURES_NO_MICRO_FEATURES_DATA_H_
+#define TENSORFLOW_LITE_MICRO_EXAMPLES_MICRO_SPEECH_MICRO_FEATURES_NO_MICRO_FEATURES_DATA_H_
 
-// This is tuned so that a full cycle takes ~4 seconds on an Arduino MKRZERO.
-const int kInferencesPerCycle = 1000;
+extern const int g_no_micro_f9643d42_nohash_4_width;
+extern const int g_no_micro_f9643d42_nohash_4_height;
+extern const signed char g_no_micro_f9643d42_nohash_4_data[];
+
+#endif  // TENSORFLOW_LITE_MICRO_EXAMPLES_MICRO_SPEECH_MICRO_FEATURES_NO_MICRO_FEATURES_DATA_H_
