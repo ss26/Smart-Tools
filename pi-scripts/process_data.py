@@ -28,6 +28,7 @@ class Preprocess:
                       'std', 'var', 'skew', 'mad', 'sum']
         self._col_dict = {sensor: None for sensor in self.sensors}
         self._raw_df = pd.DataFrame([0]*len(self.sensors)).transpose()
+        self._raw_df.columns = self.sensors
 
         self._processed_df = pd.DataFrame()
         self._num_features = len(self.stats)
@@ -72,7 +73,9 @@ class Preprocess:
             self._raw_df = pd.concat([self._raw_df, pd.DataFrame(
                 [col_dict.values()], columns=self.sensors)], axis=0, ignore_index=True)
 
+        self._raw_df = self._raw_df.tail(-1)
         self._raw_df.dropna()
+
 
     @staticmethod
     def mad(df: pd.DataFrame):
