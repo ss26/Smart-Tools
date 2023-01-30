@@ -22,8 +22,7 @@ class Preprocess:
 
     def __init__(self):
         self.sensors = ['accX', 'accY', 'accZ', 'wx', 'wy',
-                        'wz', 'bx', 'by', 'bz']
-        #         "Isens", "Srms"]
+                        'wz', 'bx', 'by', 'bz', 'Isens', 'Srms']
         self.stats = ['min', 'max', 'mean', 'kurt', 'sem',
                       'std', 'var', 'skew', 'mad', 'sum']
         self._col_dict = {sensor: None for sensor in self.sensors}
@@ -63,7 +62,7 @@ class Preprocess:
 
             col_dict = {
                 'accX': accX, 'accY': accY, 'accZ': accZ, 'wx': wx,
-                'wy': wy, 'wz': wz, 'bx': bx, 'by': by, 'bz': bz, 'isens': isens, 'mic': mic
+                'wy': wy, 'wz': wz, 'bx': bx, 'by': by, 'bz': bz, 'Isens': isens, 'Srms': mic
             }
 
             # add these two after attaching current sensor and mic
