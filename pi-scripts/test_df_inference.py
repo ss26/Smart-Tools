@@ -13,14 +13,14 @@ def get_y_test_df():
     test_df = pd.read_csv(ROOT_DIR + '/data/OL50_10secframe_Proccessed_Test_Xy_Matrix.csv')
     y = test_df['Activity']
     
-    remove_isens = ['Isens_min', 'Isens_max', 'Isens_mean', 'Isens_kurt', 'Isens_sem',
-                'Isens_std', 'Isens_var', 'Isens_skew', 'Isens_mad', 'Isens_sum']
+    # remove_isens = ['Isens_min', 'Isens_max', 'Isens_mean', 'Isens_kurt', 'Isens_sem',
+    #             'Isens_std', 'Isens_var', 'Isens_skew', 'Isens_mad', 'Isens_sum']
 
-    remove_srms = ['Srms_min', 'Srms_max', 'Srms_mean', 'Srms_kurt', 'Srms_sem',
-              'Srms_std', 'Srms_var', 'Srms_skew', 'Srms_mad', 'Srms_sum']              
+    # remove_srms = ['Srms_min', 'Srms_max', 'Srms_mean', 'Srms_kurt', 'Srms_sem',
+    #           'Srms_std', 'Srms_var', 'Srms_skew', 'Srms_mad', 'Srms_sum']              
     remove_unnamed = ['Unnamed: 0', 'Subject Number', 'Trial']
 
-    test_df = test_df.drop(remove_isens + remove_srms + remove_unnamed, axis=1)
+    test_df = test_df.drop(remove_unnamed, axis=1)
     return y, test_df
 
 def plot_cf(y_true, y_pred, title_suffix, save=False):
@@ -40,9 +40,9 @@ def accuracy(y_true, y_pred):
     return cm.diagonal()
 
 # model = tf.keras.models.load_model('/home/ss26/Projects/Smart-Tools/pi-scripts/9sensors_model')
-tflite_model = ROOT_DIR + '/pi-scripts/model.tflite'
+tflite_model = ROOT_DIR + '/models/model.tflite'
 
-num_sensors = 9
+num_sensors = 11
 num_features = 10
 
 interpreter = tf.lite.Interpreter(tflite_model)
@@ -58,7 +58,7 @@ y_pred_f32 = np.zeros(len(test_df))
 # y_pred_f32 = np.argmax(model.predict(x), axis=1)
 start_time = time.perf_counter()
 
-x = np.load(ROOT_DIR + '/pi-scripts/test_data_x_np.npy')
+x = np.load(ROOT_DIR + '/data/test_data_x_np.npy')
 
 for i, value in enumerate(x):
   tensor = value
