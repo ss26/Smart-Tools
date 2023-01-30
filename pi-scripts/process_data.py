@@ -12,6 +12,7 @@ try:
     data_getter = get_IMU_current.Current_IMU()
 except RuntimeError as e:
     print("Could not start IMU")
+    exit()
 
 
 class Preprocess:
@@ -86,7 +87,7 @@ class Preprocess:
 
         assert self._raw_df.size != 0, f"Invalid size for dataframe: {self._raw_df.size}"
         assert len(
-            self._raw_df.columns) == self._num_sensors, f"Some sensors are missing! Number of sensors detected: {self.raw_df.columns}. Needed {self._num_sensors}!"
+            self._raw_df.columns) == self._num_sensors, f"Some sensors are missing! Number of sensors detected: {len(self._raw_df.columns)}. Needed {self._num_sensors}!"
 
         # print(raw_df.describe())
         stat_df = self._raw_df.agg(
