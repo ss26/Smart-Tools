@@ -26,13 +26,13 @@ num_features = 10
 try:
     while True:
         tensor = preprocess.get_tensor()
-        # tensor = tf.cast(tensor, tf.float32)
+        tensor = tf.cast(tensor, tf.float32)
         tensor = tf.reshape(tensor, (1, num_sensors, num_features))
         interpreter.set_tensor(input_intp['index'], tensor)
         interpreter.invoke()
         y_pred = np.argmax(interpreter.get_tensor(
             output_intp['index']), axis=1)
 
-        print(f"Predicted Activity: {activities[y_pred]}")
+        print(f"Predicted Activity: {activities[y_pred[0]]}")
 except KeyboardInterrupt:
     pass
