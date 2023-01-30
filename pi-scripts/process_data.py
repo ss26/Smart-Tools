@@ -84,12 +84,12 @@ class Preprocess:
             - min, max, mean, kurtosis, sem, std, variance, skew, mad, sum
         """
 
-        assert self.raw_df.size != 0, f"Invalid size for dataframe: {self.raw_df.size}"
+        assert self._raw_df.size != 0, f"Invalid size for dataframe: {self._raw_df.size}"
         assert len(
-            self.raw_df.columns) == self._num_sensors, f"Some sensors are missing! Number of sensors detected: {self.raw_df.columns}. Needed {self._num_sensors}!"
+            self._raw_df.columns) == self._num_sensors, f"Some sensors are missing! Number of sensors detected: {self.raw_df.columns}. Needed {self._num_sensors}!"
 
         # print(raw_df.describe())
-        stat_df = self.raw_df.agg(
+        stat_df = self._raw_df.agg(
             ['min', 'max', 'mean', 'kurt', 'sem', 'std', 'var', 'skew', Preprocess.mad, 'sum'])
 #         stat_df.transpose()
         stat_df = stat_df.transpose()
