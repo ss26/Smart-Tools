@@ -1,4 +1,5 @@
 import time
+import os 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -6,8 +7,10 @@ import seaborn as sns
 from sklearn.metrics import confusion_matrix
 import tensorflow as tf
 
+ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
+
 def get_y_test_df():
-    test_df = pd.read_csv('data/OL50_10secframe_Proccessed_Test_Xy_Matrix.csv')
+    test_df = pd.read_csv(ROOT_DIR + '/data/OL50_10secframe_Proccessed_Test_Xy_Matrix.csv')
     y = test_df['Activity']
     
     remove_isens = ['Isens_min', 'Isens_max', 'Isens_mean', 'Isens_kurt', 'Isens_sem',
@@ -37,7 +40,7 @@ def accuracy(y_true, y_pred):
     return cm.diagonal()
 
 # model = tf.keras.models.load_model('/home/ss26/Projects/Smart-Tools/pi-scripts/9sensors_model')
-tflite_model = '/home/ss26/Projects/Smart-Tools/pi-scripts/model.tflite'
+tflite_model = ROOT_DIR + '/pi-scripts/model.tflite'
 
 num_sensors = 9
 num_features = 10
@@ -55,7 +58,7 @@ y_pred_f32 = np.zeros(len(test_df))
 # y_pred_f32 = np.argmax(model.predict(x), axis=1)
 start_time = time.perf_counter()
 
-x = np.load('/home/ss26/Projects/Smart-Tools/pi-scripts/test_data_x_np.npy')
+x = np.load(ROOT_DIR + '/pi-scripts/test_data_x_np.npy')
 
 for i, value in enumerate(x):
   tensor = value
