@@ -20,11 +20,14 @@ interpreter.allocate_tensors()
 output_intp = interpreter.get_output_details()[0]
 input_intp = interpreter.get_input_details()[0]
 
+num_sensors = 9
+num_features = 10
+
 try:
     while True:
         tensor = preprocess.get_tensor()
-        tensor = tf.cast(tensor, tf.float32)
-        tensor = tf.reshape(tensor, (1, 11, 10))
+        # tensor = tf.cast(tensor, tf.float32)
+        tensor = tf.reshape(tensor, (1, num_sensors, num_features))
         interpreter.set_tensor(input_intp['index'], tensor)
         interpreter.invoke()
         y_pred = np.argmax(interpreter.get_tensor(
