@@ -59,11 +59,11 @@ class Preprocess:
         # collect 3 seconds of raw data for one tensor
         buffer_time = time.perf_counter() + self._raw_buffer_time
         while time.perf_counter() <= buffer_time:
-            accX, accY, accZ, wx, wy, wz, bx, by, bz = data_getter.get_data()
+            accX, accY, accZ, wx, wy, wz, bx, by, bz, isens, mic = data_getter.get_data()
 
             col_dict = {
                 'accX': accX, 'accY': accY, 'accZ': accZ, 'wx': wx,
-                'wy': wy, 'wz': wz, 'bx': bx, 'by': by, 'bz': bz
+                'wy': wy, 'wz': wz, 'bx': bx, 'by': by, 'bz': bz, 'isens': isens, 'mic': mic
             }
 
             # add these two after attaching current sensor and mic
