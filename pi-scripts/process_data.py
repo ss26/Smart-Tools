@@ -4,13 +4,8 @@
     Obtain a single pre-processed tensor.
 """
 import pandas as pd
-import numpy as np
-from collections import defaultdict
-from itertools import product
-# import scipy as sp
 import get_IMU_current
 import time
-import tensorflow as tf
 
 
 try:
@@ -29,7 +24,7 @@ class Preprocess:
                         'wz', 'bx', 'by', 'bz']
         #         "Isens", "Srms"]
         self.stats = ['min', 'max', 'mean', 'kurt', 'sem',
-                 'std', 'var', 'skew', 'mad', 'sum']
+                      'std', 'var', 'skew', 'mad', 'sum']
         self._col_dict = {sensor: None for sensor in self.sensors}
         self._raw_df = pd.DataFrame([0]*len(self.sensors)).transpose()
 
@@ -38,13 +33,13 @@ class Preprocess:
         self._num_sensors = len(self.sensors)
         self._tensor = None
         self._raw_buffer_time = 0.01        # time of serial buffer data
-        self._processed_buffer_time = 1     # time for processed data
-        
-        processed_buffer_time = time.perf_counter() + self._processed_buffer_time
-        while time.perf_counter() <= processed_buffer_time:
-            self.get_raw_df()
-            self.get_processed_df()
-        print("Done one round of processing!")
+        # self._processed_buffer_time = 1     # time for processed data
+
+        # processed_buffer_time = time.perf_counter() + self._processed_buffer_time
+        # while time.perf_counter() <= processed_buffer_time:
+        self.get_raw_df()
+        self.get_processed_df()
+        # print("Done one round of processing!")
 
     # @staticmethod
     # def get_statistics(sensor_dict):
@@ -101,6 +96,6 @@ class Preprocess:
 
         self._processed_df = stat_df.unstack().to_frame().T
         self._processed_df.columns = self._processed_df.columns.map('_'.join)
-        
-    def get_tensor(self):        
+
+    def get_tensor(self):
         return self._processed_df.to_numpy()
