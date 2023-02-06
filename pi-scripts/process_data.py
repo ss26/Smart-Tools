@@ -54,10 +54,10 @@ class Preprocess:
         CREATES
             One pandas DataFrame containing buffer_time worth raw data
         """
-
-        buffer_time = time.perf_counter() + self._raw_buffer_time
+        
+        start_time = time.perf_counter()
         print("Starting buffer...")
-        while time.perf_counter() <= buffer_time:
+        while time.perf_counter() <= start_time + self._raw_buffer_time:
             accX, accY, accZ, wx, wy, wz, bx, by, bz, isens, mic = data_getter.get_data()
 
             col_dict = {
@@ -71,7 +71,8 @@ class Preprocess:
 
             self._raw_df = pd.concat([self._raw_df, pd.DataFrame(
                 [col_dict.values()], columns=self.sensors)], axis=0, ignore_index=True)
-        print(f"Total elapsed buffer time: {time.perf_counter() - buffer_time}")
+        end_time = time.perf_counter()
+        print(f"Total elapsed buffer time: {end_time - start_time}")
         self._raw_df = self._raw_df.tail(-1)
         self._raw_df.dropna()
 
