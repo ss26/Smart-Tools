@@ -33,7 +33,7 @@ class Preprocess:
         self._num_features = len(self.stats)
         self._num_sensors = len(self.sensors)
         self._tensor = None
-        self._raw_buffer_time = 10        # time of serial buffer data
+        self._raw_buffer_time = 2        # time of serial buffer data
         # self._processed_buffer_time = 1     # time for processed data
 
         # processed_buffer_time = time.perf_counter() + self._processed_buffer_time
@@ -70,7 +70,6 @@ class Preprocess:
             self._raw_df = pd.concat([self._raw_df, pd.DataFrame(
                 [col_dict.values()], columns=self.sensors)], axis=0, ignore_index=True)
         end_time = time.perf_counter()
-        time.sleep(1)
         print(f"Total elapsed buffer time: {end_time - start_time}")
         self._raw_df = self._raw_df.tail(-1)
         self._raw_df.dropna()

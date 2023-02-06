@@ -2,6 +2,7 @@ import numpy as np
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 import os
+import time
 from process_data import Preprocess
 import warnings
 import tensorflow as tf
@@ -38,5 +39,7 @@ try:
             output_intp['index']), axis=1)
 
         print(f"Predicted Activity: {activities[y_pred[0]]}")
+        time.sleep(1)
+        
 except KeyboardInterrupt:
     pass
