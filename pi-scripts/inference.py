@@ -29,6 +29,7 @@ num_features = 10
 try:
     while True:
         tensor = preprocess.get_tensor()
+        print(tensor)
         tensor = tf.cast(tensor, tf.float32)
         tensor = tf.reshape(tensor, (1, num_sensors, num_features))
         interpreter.set_tensor(input_intp['index'], tensor)
