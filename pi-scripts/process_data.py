@@ -56,6 +56,7 @@ class Preprocess:
         """
 
         buffer_time = time.perf_counter() + self._raw_buffer_time
+        print("Starting buffer...")
         while time.perf_counter() <= buffer_time:
             accX, accY, accZ, wx, wy, wz, bx, by, bz, isens, mic = data_getter.get_data()
 
@@ -70,7 +71,7 @@ class Preprocess:
 
             self._raw_df = pd.concat([self._raw_df, pd.DataFrame(
                 [col_dict.values()], columns=self.sensors)], axis=0, ignore_index=True)
-        print(time.perf_counter() - buffer_time)
+        print(f"Total elapsed buffer time: {time.perf_counter() - buffer_time}")
         self._raw_df = self._raw_df.tail(-1)
         self._raw_df.dropna()
 
