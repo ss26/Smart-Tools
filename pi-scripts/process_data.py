@@ -72,6 +72,7 @@ class Preprocess:
             self._raw_df = pd.concat([self._raw_df, pd.DataFrame(
                 [col_dict.values()], columns=self.sensors)], axis=0, ignore_index=True)
         end_time = time.perf_counter()
+        time.sleep(1)
         print(f"Total elapsed buffer time: {end_time - start_time}")
         self._raw_df = self._raw_df.tail(-1)
         self._raw_df.dropna()
