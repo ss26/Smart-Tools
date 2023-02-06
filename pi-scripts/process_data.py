@@ -38,8 +38,6 @@ class Preprocess:
 
         # processed_buffer_time = time.perf_counter() + self._processed_buffer_time
         # while time.perf_counter() <= processed_buffer_time:
-        self.get_raw_df()
-        self.get_processed_df()
         # print("Done one round of processing!")
 
     # @staticmethod
@@ -103,4 +101,7 @@ class Preprocess:
         self._processed_df.columns = self._processed_df.columns.map('_'.join)
 
     def get_tensor(self):
-        return self._processed_df.to_numpy()
+        self.get_raw_df()
+        self.get_processed_df()
+        tensor_np = self._processed_df.to_numpy()
+        return tensor_np
