@@ -47,7 +47,7 @@ class Preprocess:
     #     stats = ['min', 'max', 'mean', 'kurt', 'sem', 'std', 'var', 'skew', 'mad', 'sum']
     #     complete_stats = product(sensors, stats)
 
-    def get_raw_df(self):
+    def make_raw_df(self):
         """
         CREATES
             One pandas DataFrame containing buffer_time worth raw data
@@ -79,7 +79,7 @@ class Preprocess:
     def mad(df: pd.DataFrame):
         return (df - df.mean()).abs().mean()
 
-    def get_processed_df(self):
+    def make_processed_df(self):
         """
         CREATES
             One pandas dataframe row containing the following statistics across self.sensors:
@@ -99,8 +99,14 @@ class Preprocess:
         self._processed_df = stat_df.unstack().to_frame().T
         self._processed_df.columns = self._processed_df.columns.map('_'.join)
 
+    def get_raw_df(self):
+        return self._raw_df
+
+    def get_processed_df(self):
+        return self._processed_df
+
     def get_tensor(self):
-        self.get_raw_df()
-        self.get_processed_df()
+        self.make_raw_df()
+        self.make_processed_df()
         tensor_np = self._processed_df.to_numpy()
         return tensor_np
