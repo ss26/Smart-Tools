@@ -99,7 +99,9 @@ class Preprocess:
         self._processed_df = stat_df.unstack().to_frame().T
         self._processed_df.columns = self._processed_df.columns.map('_'.join)
 
-    def get_raw_df(self):
+    def get_raw_df(self, timestamp=None):
+        if timestamp:
+            self._processed_df.insert(1, 'timestamp', timestamp)
         return self._raw_df
 
     def get_processed_df(self):
