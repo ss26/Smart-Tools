@@ -18,7 +18,7 @@ df = preprocess.get_processed_df(time.time())
 
 try:
     while True:
-        df = preprocess.get_processed_df(time.time())
+        df = preprocess.get_raw_df(time.time())
         df = pd.concat([df, df], axis=1, ignore_index=True)
 
 except KeyboardInterrupt:
