@@ -47,7 +47,7 @@ class Preprocess:
     #     stats = ['min', 'max', 'mean', 'kurt', 'sem', 'std', 'var', 'skew', 'mad', 'sum']
     #     complete_stats = product(sensors, stats)
 
-    def make_raw_df(self):
+    def make_raw_df(self, timestamp=False):
         """
         CREATES
             One pandas DataFrame containing buffer_time worth raw data
@@ -73,6 +73,8 @@ class Preprocess:
         print(f"Total elapsed buffer time: {end_time - start_time}")
         self._raw_df = self._raw_df.tail(-1)
         self._raw_df.dropna()
+        if timestamp:
+            self._raw_df.insert(1, 'timestamp', time.time())
 
 
     @staticmethod
@@ -98,16 +100,17 @@ class Preprocess:
 
         self._processed_df = stat_df.unstack().to_frame().T
         self._processed_df.columns = self._processed_df.columns.map('_'.join)
+        
 
-    def get_raw_df(self, timestamp=None):
-        if timestamp:
-            self._processed_df.insert(1, 'timestamp', timestamp)
+    def get_raw_df(self):
+        self.make_raw_df(timestamp=True)
         return self._raw_df
 
     def get_processed_df(self):
         return self._processed_df
 
     def get_tensor(self):
+        # no timestamp for inference
         self.make_raw_df()
         self.make_processed_df()
         tensor_np = self._processed_df.to_numpy()

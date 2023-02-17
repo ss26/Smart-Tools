@@ -1,4 +1,3 @@
-import time
 import os
 import pandas as pd
 from process_data import Preprocess
@@ -14,11 +13,11 @@ data_filename = input('Enter filename to store data:')
 data_filename = data_filename + '.csv'
 
 # get once to concat next
-df = preprocess.get_raw_df(time.time())
+df = preprocess.get_raw_df()
 
 try:
     while True:
-        df = preprocess.get_raw_df(time.time())
+        df = preprocess.get_raw_df()
         df = pd.concat([df, df], axis=1, ignore_index=True)
 
 except KeyboardInterrupt:
