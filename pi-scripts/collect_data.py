@@ -23,4 +23,4 @@ try:
 except KeyboardInterrupt:
     pass
 
-df.to_csv(data_filename)
+df.to_csv(data_filename, header=df.columns)
