@@ -52,7 +52,7 @@ class Preprocess:
         CREATES
             One pandas DataFrame containing buffer_time worth raw data
         """
-        
+
         start_time = time.perf_counter()
         print("Starting buffer...")
         while time.perf_counter() <= start_time + self._raw_buffer_time:
@@ -63,23 +63,18 @@ class Preprocess:
                 'wy': wy, 'wz': wz, 'bx': bx, 'by': by, 'bz': bz, 'Isens': isens, 'Srms': mic
             }
 
-            # add these two after attaching current sensor and mic
-            # isens = np.random.rand(1,)
-            # srms = np.random.rand(1,)
-
             self._raw_df = pd.concat([self._raw_df, pd.DataFrame(
                 [col_dict.values()], columns=self.sensors)], axis=0, ignore_index=True)
+                
         end_time = time.perf_counter()
         print(f"Total elapsed buffer time: {end_time - start_time}")
         self._raw_df = self._raw_df.tail(-1)
         self._raw_df.dropna()
-        if timestamp and ('timestamp' in self._raw_df.columns):
+        print(self._raw_df.columns)
+        if timestamp:
+            if 'timestamp' not in self._raw_df.columns:
+                self._raw_df.insert(0, 'timestamp', time.time())
             self._raw_df['timestamp'] = time.time()
-        elif timestamp:
-            self._raw_df.insert(1, 'timestamp', time.time())
-        else:
-            pass
-
 
     @staticmethod
     def mad(df: pd.DataFrame):
@@ -104,7 +99,6 @@ class Preprocess:
 
         self._processed_df = stat_df.unstack().to_frame().T
         self._processed_df.columns = self._processed_df.columns.map('_'.join)
-        
 
     def get_raw_df(self):
         self.make_raw_df(timestamp=True)
