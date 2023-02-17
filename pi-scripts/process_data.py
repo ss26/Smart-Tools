@@ -73,8 +73,12 @@ class Preprocess:
         print(f"Total elapsed buffer time: {end_time - start_time}")
         self._raw_df = self._raw_df.tail(-1)
         self._raw_df.dropna()
-        if timestamp:
+        if timestamp and ('timestamp' in self._raw_df.columns):
+            self._raw_df['timestamp'] = time.time()
+        elif timestamp:
             self._raw_df.insert(1, 'timestamp', time.time())
+        else:
+            pass
 
 
     @staticmethod
