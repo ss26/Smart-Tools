@@ -14,7 +14,7 @@ data_filename = input('Enter filename to store data:')
 data_filename = data_filename + '.csv'
 
 # get once to concat next
-df = preprocess.get_processed_df(time.time())
+df = preprocess.get_raw_df(time.time())
 
 try:
     while True:
