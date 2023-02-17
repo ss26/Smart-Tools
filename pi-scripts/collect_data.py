@@ -17,8 +17,8 @@ df = preprocess.get_raw_df()
 
 try:
     while True:
-        df = preprocess.get_raw_df()
-        df = pd.concat([df, df], axis=0, ignore_index=True)
+        new_df = preprocess.get_raw_df()
+        df = pd.concat([df, new_df], axis=0, ignore_index=True)
 
 except KeyboardInterrupt:
     pass
