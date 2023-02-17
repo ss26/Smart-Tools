@@ -8,9 +8,9 @@ DATA_DIR = ROOT_DIR + '/data/'
 preprocess = Preprocess()
 
 
-data_filename = input('Enter filename to store data:')
+data_filename = input('Enter filename to store data: ')
 
-data_filename = data_filename + '.csv'
+data_filename = DATA_DIR + data_filename + '.csv'
 
 # get once to concat next
 df = preprocess.get_raw_df()
