@@ -18,7 +18,7 @@ df = preprocess.get_raw_df()
 try:
     while True:
         df = preprocess.get_raw_df()
-        df = pd.concat([df, df], axis=1, ignore_index=True)
+        df = pd.concat([df, df], axis=0, ignore_index=True)
 
 except KeyboardInterrupt:
     pass
