@@ -4,12 +4,12 @@
     Obtain a single pre-processed tensor.
 """
 import pandas as pd
-import get_IMU_current
+import get_data
 import time
 
 
 try:
-    data_getter = get_IMU_current.Current_IMU()
+    data_getter = get_data.DataCollector()
 except RuntimeError as e:
     print("Could not start IMU")
     exit()
@@ -21,7 +21,7 @@ class Preprocess:
     """
 
     def __init__(self):
-        self.sensors = ['accX', 'accY', 'accZ', 'wx', 'wy',
+        self.sensors = ['heading', 'roll', 'pitch', 'accX', 'accY', 'accZ', 'wx', 'wy',
                         'wz', 'bx', 'by', 'bz', 'Isens', 'Srms']
         self.stats = ['min', 'max', 'mean', 'kurt', 'sem',
                       'std', 'var', 'skew', 'mad', 'sum']
@@ -33,9 +33,11 @@ class Preprocess:
         self._num_features = len(self.stats)
         self._num_sensors = len(self.sensors)
         self._tensor = None
-        self._raw_buffer_time = 2        # time of serial buffer data
+        self._raw_buffer_time = int(input("How long do you want to run the buffer, in seconds? "))
+        if not isinstance(self._raw_buffer_time, int) and self._raw_buffer_time > 0:
+            self._raw_buffer_time = 5       # time of serial buffer data
+        
         # self._processed_buffer_time = 1     # time for processed data
-
         # processed_buffer_time = time.perf_counter() + self._processed_buffer_time
         # while time.perf_counter() <= processed_buffer_time:
         # print("Done one round of processing!")
@@ -56,11 +58,12 @@ class Preprocess:
         start_time = time.perf_counter()
         print("Starting buffer...")
         while time.perf_counter() <= start_time + self._raw_buffer_time:
-            accX, accY, accZ, wx, wy, wz, bx, by, bz, isens, mic = data_getter.get_data()
+            heading, roll, pitch, accX, accY, accZ, wx, wy, wz, bx, by, bz, isens, mic = data_getter.get_data()
 
             col_dict = {
-                'accX': accX, 'accY': accY, 'accZ': accZ, 'wx': wx,
-                'wy': wy, 'wz': wz, 'bx': bx, 'by': by, 'bz': bz, 'Isens': isens, 'Srms': mic
+                'heading': heading, 'roll': roll, 'pitch': pitch, 'accX': accX, 
+                'accY': accY, 'accZ': accZ, 'wx': wx, 'wy': wy, 'wz': wz, 'bx': bx, 
+                'by': by, 'bz': bz, 'Isens': isens, 'Srms': mic
             }
 
             self._raw_df = pd.concat([self._raw_df, pd.DataFrame(
@@ -68,7 +71,7 @@ class Preprocess:
 
         end_time = time.perf_counter()
         print(f"Total elapsed buffer time: {end_time - start_time}")
-        self._raw_df = self._raw_df.tail(-1)
+        self._raw_df = self._raw_df.tail(-1)    # remove dummy first row
         self._raw_df.dropna()
         print(self._raw_df.columns)
         print(self._raw_df.shape)
