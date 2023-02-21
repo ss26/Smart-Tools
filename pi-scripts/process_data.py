@@ -27,6 +27,7 @@ class Preprocess:
         self.stats = ['min', 'max', 'mean', 'kurt', 'sem',
                       'std', 'var', 'skew', 'mad', 'sum']
         self._col_dict = {sensor: None for sensor in self.sensors}
+
         self._raw_df = pd.DataFrame([0]*len(self.timestamp + self.sensors)).transpose()
         self._raw_df.columns = self.timestamp + self.sensors
         self._activities = {0: 'Engrave', 1: 'Cut', 2: 'Sand', 3: 'Route'}
@@ -62,6 +63,8 @@ class Preprocess:
         if labels:
             activity = input("What activity are you doing? ")
             activity = list(self._activities.values()).index(activity)
+            self._raw_df = pd.DataFrame([0]*(len(self.sensors) + 2)) # timestamp and activity
+            self._raw_df.columns = self.timestamp + self.sensors + 'Activity'
     
         while time.perf_counter() <= start_time + self._raw_buffer_time:
             heading, roll, pitch, accX, accY, accZ, wx, wy, wz, bx, by, bz, isens, mic = data_getter.get_data()
