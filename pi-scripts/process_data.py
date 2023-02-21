@@ -21,13 +21,15 @@ class Preprocess:
     """
 
     def __init__(self):
-        self.sensors = ['heading', 'roll', 'pitch', 'accX', 'accY', 'accZ', 'wx', 'wy',
+        self.timestamp = ['timestamp']
+        self.sensors = ['roll', 'pitch', 'yaw', 'accX', 'accY', 'accZ', 'wx', 'wy',
                         'wz', 'bx', 'by', 'bz', 'Isens', 'Srms']
         self.stats = ['min', 'max', 'mean', 'kurt', 'sem',
                       'std', 'var', 'skew', 'mad', 'sum']
         self._col_dict = {sensor: None for sensor in self.sensors}
         self._raw_df = pd.DataFrame([0]*len(self.sensors)).transpose()
         self._raw_df.columns = self.sensors
+        self._activities = {0: 'Engrave', 1: 'Cut', 2: 'Sand', 3: 'Route'}
 
         self._processed_df = pd.DataFrame()
         self._num_features = len(self.stats)
@@ -49,7 +51,7 @@ class Preprocess:
     #     stats = ['min', 'max', 'mean', 'kurt', 'sem', 'std', 'var', 'skew', 'mad', 'sum']
     #     complete_stats = product(sensors, stats)
 
-    def make_raw_df(self, timestamp=False):
+    def make_raw_df(self, timestamp=False, labels=False):
         """
         CREATES
             One pandas DataFrame containing buffer_time worth raw data
@@ -57,17 +59,21 @@ class Preprocess:
 
         start_time = time.perf_counter()
         print("Starting buffer...")
+        if labels:
+            activity = input("What activity are you doing? ")
+            activity = list(self._activities.values()).index(activity)
+    
         while time.perf_counter() <= start_time + self._raw_buffer_time:
             heading, roll, pitch, accX, accY, accZ, wx, wy, wz, bx, by, bz, isens, mic = data_getter.get_data()
 
             col_dict = {
-                'heading': heading, 'roll': roll, 'pitch': pitch, 'accX': accX, 
-                'accY': accY, 'accZ': accZ, 'wx': wx, 'wy': wy, 'wz': wz, 'bx': bx, 
-                'by': by, 'bz': bz, 'Isens': isens, 'Srms': mic
+                'timestamp': time.perf_counter() - start_time, 'roll': roll, 'pitch': pitch, 'yaw': heading, 
+                'accX': accX, 'accY': accY, 'accZ': accZ, 'wx': wx, 'wy': wy, 'wz': wz, 'bx': bx, 
+                'by': by, 'bz': bz, 'Isens': isens, 'Srms': mic, 'activity': activity
             }
 
             self._raw_df = pd.concat([self._raw_df, pd.DataFrame(
-                [col_dict.values()], columns=self.sensors)], axis=0, ignore_index=True)
+                [col_dict.values()], columns=self.timestamp + self.sensors)], axis=0, ignore_index=True)
 
         end_time = time.perf_counter()
         print(f"Total elapsed buffer time: {end_time - start_time}")
@@ -75,10 +81,7 @@ class Preprocess:
         self._raw_df.dropna()
         print(self._raw_df.columns)
         print(self._raw_df.shape)
-        if timestamp:
-            if 'timestamp' not in self._raw_df.columns:
-                self._raw_df.insert(0, 'timestamp', time.time())
-            self._raw_df['timestamp'] = time.time()
+        
 
     @staticmethod
     def mad(df: pd.DataFrame):
@@ -104,8 +107,8 @@ class Preprocess:
         self._processed_df = stat_df.unstack().to_frame().T
         self._processed_df.columns = self._processed_df.columns.map('_'.join)
 
-    def get_raw_df(self):
-        self.make_raw_df(timestamp=True)
+    def get_raw_df(self, timestamp, labels):
+        self.make_raw_df(timestamp=timestamp, labels=labels)
         return self._raw_df
 
     def get_processed_df(self):
