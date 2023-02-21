@@ -64,7 +64,7 @@ class Preprocess:
             activity = input("What activity are you doing? ")
             activity = list(self._activities.values()).index(activity)
             self._raw_df = pd.DataFrame([0]*(len(self.sensors) + 2)) # timestamp and activity
-            self._raw_df.columns = self.timestamp + self.sensors + 'Activity'
+            # self._raw_df.columns = self.timestamp + self.sensors 
     
         while time.perf_counter() <= start_time + self._raw_buffer_time:
             heading, roll, pitch, accX, accY, accZ, wx, wy, wz, bx, by, bz, isens, mic = data_getter.get_data()
@@ -75,7 +75,7 @@ class Preprocess:
             }
 
             self._raw_df = pd.concat([self._raw_df, pd.DataFrame(
-                [col_dict.values()], columns=self.timestamp + self.sensors)], axis=0, ignore_index=True)
+                [col_dict.values()], columns=self.timestamp + self.sensors + ['Activity'])], axis=0, ignore_index=True)
 
         end_time = time.perf_counter()
         print(f"Total elapsed buffer time: {end_time - start_time}")
