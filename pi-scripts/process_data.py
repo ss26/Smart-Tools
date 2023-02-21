@@ -65,7 +65,7 @@ class Preprocess:
     
         while time.perf_counter() <= start_time + self._raw_buffer_time:
             heading, roll, pitch, accX, accY, accZ, wx, wy, wz, bx, by, bz, isens, mic = data_getter.get_data()
-
+            print("Inside main loop")
             col_dict = {
                 'timestamp': time.perf_counter() - start_time, 'roll': roll, 'pitch': pitch, 'yaw': heading, 
                 'accX': accX, 'accY': accY, 'accZ': accZ, 'wx': wx, 'wy': wy, 'wz': wz, 'bx': bx, 
