@@ -28,7 +28,7 @@ class Preprocess:
                       'std', 'var', 'skew', 'mad', 'sum']
         self._col_dict = {sensor: None for sensor in self.sensors}
         self._raw_df = pd.DataFrame([0]*len(self.timestamp + self.sensors)).transpose()
-        self._raw_df.columns = self.sensors
+        self._raw_df.columns = self.timestamp + self.sensors
         self._activities = {0: 'Engrave', 1: 'Cut', 2: 'Sand', 3: 'Route'}
 
         self._processed_df = pd.DataFrame()
