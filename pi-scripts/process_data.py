@@ -27,7 +27,7 @@ class Preprocess:
         self.stats = ['min', 'max', 'mean', 'kurt', 'sem',
                       'std', 'var', 'skew', 'mad', 'sum']
         self._col_dict = {sensor: None for sensor in self.sensors}
-        self._raw_df = pd.DataFrame([0]*len(self.sensors)).transpose()
+        self._raw_df = pd.DataFrame([0]*len(self.timestamp + self.sensors)).transpose()
         self._raw_df.columns = self.sensors
         self._activities = {0: 'Engrave', 1: 'Cut', 2: 'Sand', 3: 'Route'}
 
@@ -65,7 +65,6 @@ class Preprocess:
     
         while time.perf_counter() <= start_time + self._raw_buffer_time:
             heading, roll, pitch, accX, accY, accZ, wx, wy, wz, bx, by, bz, isens, mic = data_getter.get_data()
-            print("Inside main loop")
             col_dict = {
                 'timestamp': time.perf_counter() - start_time, 'roll': roll, 'pitch': pitch, 'yaw': heading, 
                 'accX': accX, 'accY': accY, 'accZ': accZ, 'wx': wx, 'wy': wy, 'wz': wz, 'bx': bx, 
