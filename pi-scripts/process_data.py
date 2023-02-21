@@ -37,11 +37,7 @@ class Preprocess:
         self._num_features = len(self.stats)
         self._num_sensors = len(self.sensors)
         self._tensor = None
-        self._raw_buffer_time = int(
-            input("How long do you want to run the buffer, in seconds? "))
-        if not isinstance(self._raw_buffer_time, int) and self._raw_buffer_time > 0:
-            self._raw_buffer_time = 5       # time of serial buffer data
-
+        
         # self._processed_buffer_time = 1     # time for processed data
         # processed_buffer_time = time.perf_counter() + self._processed_buffer_time
         # while time.perf_counter() <= processed_buffer_time:
@@ -59,7 +55,11 @@ class Preprocess:
         CREATES
             One pandas DataFrame containing buffer_time worth raw data
         """
-
+        self._raw_buffer_time = int(
+            input("How long do you want to run the buffer, in seconds? "))
+        if not isinstance(self._raw_buffer_time, int) and self._raw_buffer_time > 0:
+            self._raw_buffer_time = 5       # time of serial buffer data
+            
         start_time = time.perf_counter()
 
         if labels:
