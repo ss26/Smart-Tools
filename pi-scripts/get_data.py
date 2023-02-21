@@ -2,18 +2,22 @@ import logging
 import sys
 import time
 from Adafruit_BNO055 import BNO055
+
 import board
 import busio
-import adafruit_ads1x15.ads1115 as ADS
-from adafruit_ads1x15.analog_in import AnalogIn
+import digitalio
+import spidev
+from adafruit_mcp3xxx import mcp3008 as MCP
+from adafruit_mcp3xxx.analog_in import AnalogIn
 
 class DataCollector:
     def __init__(self):
         self.bno = BNO055.BNO055(serial_port='/dev/serial0', rst=18)
-        self.i2c = busio.I2C(board.SCL, board.SDA)
-        self.ads = ADS.ADS1115(self.i2c)
-        self.current = AnalogIn(self.ads, ADS.P0)
-        self.mic = AnalogIn(self.ads, ADS.P2)
+        self.spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
+        self.cs = digitalio.DigitalInOut(board.D22)
+        self.mcp = MCP.MCP3008(self.spi, self.cs)
+        self.current = AnalogIn(self.mcp, MCP.P0)
+        self.mic = AnalogIn(self.mcp, MCP.P1)
         
         if len(sys.argv) == 2 and sys.argv[1].lower() == '-v':
             logging.basicConfig(level=logging.DEBUG)
