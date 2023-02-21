@@ -16,7 +16,7 @@ class DataCollector:
         self.spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
         self.cs = digitalio.DigitalInOut(board.D22)
         self.mcp = MCP.MCP3008(self.spi, self.cs)
-        self.current = AnalogIn(self.mcp, MCP.P0)
+        # self.current = AnalogIn(self.mcp, MCP.P0)
         # self.mic = AnalogIn(self.mcp, MCP.P1)
         
         if len(sys.argv) == 2 and sys.argv[1].lower() == '-v':
@@ -49,6 +49,6 @@ class DataCollector:
         Accx,Accy,Accz = self.bno.read_accelerometer()
 
         
-        return heading, roll, pitch, Accx, Accy, Accz, wx, wy, wz, bx, by, bz, self.current.value, 0
+        return heading, roll, pitch, Accx, Accy, Accz, wx, wy, wz, bx, by, bz, 0, 0
         # print(f'AccX={Accx:.2F} AccY={Accy:.2F} AccZ={Accz:.2F} wx={wx:.2F} wy={wy:.2F} wz={wz:.2F} bx={bx:.2F} by={by:.2F} bz={bz:.2F} heading = {heading:.2F} Roll = {roll:.2F} Pitch = {pitch:.2F}' )
         # print(f'Isens={chan.value:.2F}')

@@ -60,8 +60,6 @@ class Preprocess:
         if not isinstance(self._raw_buffer_time, int) and self._raw_buffer_time > 0:
             self._raw_buffer_time = 5       # time of serial buffer data
             
-        start_time = time.perf_counter()
-
         if labels:
             activity = input("What activity are you doing? ")
             activity = list(self._activities.values()).index(activity)
@@ -70,6 +68,8 @@ class Preprocess:
             # self._raw_df.columns = self.timestamp + self.sensors
 
         print("Starting buffer...")
+
+        start_time = time.perf_counter()
 
         while time.perf_counter() <= start_time + self._raw_buffer_time:
             heading, roll, pitch, accX, accY, accZ, wx, wy, wz, bx, by, bz, isens, mic = data_getter.get_data()
