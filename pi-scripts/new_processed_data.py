@@ -20,11 +20,11 @@ def make_processed_df(raw_df, activity):
 
     processed_df = pd.DataFrame()
 
-    for i in tqdm(range(1396)):
+    for i in tqdm(range(0,3900,10)):
         _processed_df = pd.DataFrame()
-        raw_df_buf = raw_df.iloc[i:i+3,:]
+        raw_df_buf = raw_df.iloc[i:i+300,:]
         stat_df = raw_df_buf.agg(
-            ['min', 'max', 'mean', 'kurt', 'sem', 'std', 'var', 'skew', mad, 'sum'], bias=False)        
+            ['min', 'max', 'mean', 'kurt', 'sem', 'std', 'var', 'skew', mad, 'sum'])        
         _processed_df = stat_df.unstack().to_frame().T
         _processed_df.columns = _processed_df.columns.map('_'.join)
         processed_df = processed_df.append(_processed_df)
@@ -32,9 +32,19 @@ def make_processed_df(raw_df, activity):
     return processed_df
 
 
-data_filename = '/home/ss26/Projects/Smart-Tools/data/processed_routing.csv'
+data_filename = '/home/ss26/Projects/Smart-Tools/data/processed_engraving.csv'
+# data_filename = '/home/ss26/Projects/Smart-Tools/data/processed_cutting.csv'
+# data_filename = '/home/ss26/Projects/Smart-Tools/data/processed_sanding.csv'
+# data_filename = '/home/ss26/Projects/Smart-Tools/data/processed_routing.csv'
 
-df = pd.read_csv('/home/ss26/Projects/Smart-Tools/data/reshaped_routing.csv')
-proc_df = make_processed_df(df, 3)
+df = pd.read_csv('/home/ss26/Projects/Smart-Tools/data/reshaped_engraving.csv')
+# df = pd.read_csv('/home/ss26/Projects/Smart-Tools/data/reshaped_cutting.csv')
+# df = pd.read_csv('/home/ss26/Projects/Smart-Tools/data/reshaped_sanding.csv')
+# df = pd.read_csv('/home/ss26/Projects/Smart-Tools/data/reshaped_routing.csv')
+
+proc_df = make_processed_df(df, 0)
+# proc_df = make_processed_df(df, 1)
+# proc_df = make_processed_df(df, 2)
+# proc_df = make_processed_df(df, 3)
 
 proc_df.to_csv(data_filename)
