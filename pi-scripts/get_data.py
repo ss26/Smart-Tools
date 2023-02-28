@@ -16,8 +16,8 @@ class DataCollector:
         self.spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
         self.cs = digitalio.DigitalInOut(board.D22)
         self.mcp = MCP.MCP3008(self.spi, self.cs)
-        # self.current = AnalogIn(self.mcp, MCP.P0)
-        # self.mic = AnalogIn(self.mcp, MCP.P1)
+        self.current = AnalogIn(self.mcp, MCP.P0)
+        self.mic = AnalogIn(self.mcp, MCP.P1)
         
         if len(sys.argv) == 2 and sys.argv[1].lower() == '-v':
             logging.basicConfig(level=logging.DEBUG)
