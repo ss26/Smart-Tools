@@ -49,6 +49,6 @@ class DataCollector:
         Accx,Accy,Accz = self.bno.read_accelerometer()
 
         
-        return heading, roll, pitch, Accx, Accy, Accz, wx, wy, wz, bx, by, bz, self.current, self.mic
+        return heading, roll, pitch, Accx, Accy, Accz, wx, wy, wz, bx, by, bz, self.current.value, self.mic.value
         # print(f'AccX={Accx:.2F} AccY={Accy:.2F} AccZ={Accz:.2F} wx={wx:.2F} wy={wy:.2F} wz={wz:.2F} bx={bx:.2F} by={by:.2F} bz={bz:.2F} heading = {heading:.2F} Roll = {roll:.2F} Pitch = {pitch:.2F}' )
         # print(f'Isens={chan.value:.2F}')
