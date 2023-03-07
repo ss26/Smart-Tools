@@ -41,13 +41,15 @@ try:
         if force < 2.5:
             force = 0
 
-        if current > 1.9:
+        if current > 1.8:
             start_times += [time.perf_counter()]
-        if current < 1.9:
+        if current < 1.8:
             stop_times += [time.perf_counter()]
 
         forces += [force]
         angles += [roll]
+        
+        print(current)
     
     while True:
         if stop_times[0] < start_times[0]:
@@ -62,6 +64,7 @@ try:
     total_times = [x - y for x,y in zip(stop_times, start_times)]
     text = f"Num Passes = {len(total_times)}\nAvg. Time/Pass = {sum(total_times)/len(total_times)} s\nAvg. Force = {sum(forces)/len(forces)} lbf\nAvg. Roll Angle = {sum(angles)/len(angles)} deg."
     OLED.print_on_OLED(text)
+    
         
         
 except KeyboardInterrupt:
