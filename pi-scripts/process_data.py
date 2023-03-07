@@ -99,8 +99,6 @@ class Preprocess:
         print(f"Total elapsed buffer time: {end_time - start_time}")
         self._raw_df = self._raw_df.tail(-1)    # remove dummy first row
         self._raw_df.dropna()
-        print(self._raw_df.columns)
-        print(self._raw_df.shape)
 
     @staticmethod
     def mad(df: pd.DataFrame):
@@ -122,6 +120,9 @@ class Preprocess:
         if raw_df.shape[0]%590 != 0:
             raw_df = raw_df.tail((raw_df.shape[0] - raw_df.shape[0]%590))
         
+        print(self._raw_df.columns)
+        print(self._raw_df.shape)
+
         for i in range(0,raw_df.shape[0], 295):
             processed_df = pd.DataFrame()
             raw_df_buf = raw_df.iloc[i:i+590,:]
@@ -130,7 +131,7 @@ class Preprocess:
             # stat_df = stat_df.transpose()
             processed_df = stat_df.unstack().to_frame().T
             processed_df.columns = processed_df.columns.map('_'.join)
-            pd.concat([self._processed_df,processed_df], axis=0, ignore_index=True)
+            pd.concat([self._processed_df, processed_df], axis=0, ignore_index=True)
         
 
     def get_raw_df(self, timestamp, labels):
@@ -140,6 +141,7 @@ class Preprocess:
     def get_processed_df(self, raw_buf_time=None):
         self.make_raw_df(raw_buf_time=raw_buf_time)
         self.make_processed_df(self._raw_df)
+        print(self._processed_df)
         return self._processed_df
 
     def get_tensor(self,raw_buf_time=None ):
