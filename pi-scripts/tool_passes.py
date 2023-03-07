@@ -10,7 +10,7 @@ warnings.filterwarnings('ignore')
 
 data_getter = get_data.DataCollector()
 
-sma_window = 120
+sma_window = 90
 
 buffer_time = int(input("Enter time of activity: "))
 
