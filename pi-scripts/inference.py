@@ -6,6 +6,7 @@ import time
 from process_data import Preprocess
 import warnings
 import tensorflow as tf
+import OLED
 
 ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
 
@@ -39,6 +40,7 @@ try:
             output_intp['index']), axis=1)
 
         print(f"Predicted Activity: {activities[y_pred[0]]}")
+        OLED.print_on_OLED({activities[y_pred[0]]})
         time.sleep(1)
         
 except KeyboardInterrupt:
