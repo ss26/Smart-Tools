@@ -126,7 +126,7 @@ class Preprocess:
             raw_df_buf = raw_df.iloc[i:i+590,:]
             stat_df = raw_df_buf.agg(
                 ['min', 'max', 'mean', 'kurt', 'sem', 'std', 'var', 'skew', Preprocess.mad, 'sum'])
-            stat_df = stat_df.transpose()
+            # stat_df = stat_df.transpose()
             processed_df = stat_df.unstack().to_frame().T
             processed_df.columns = processed_df.columns.map('_'.join)
             self._processed_df.append(processed_df)
