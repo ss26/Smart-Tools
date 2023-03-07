@@ -1,4 +1,3 @@
-from process_data import Preprocess
 import OLED
 import os
 import warnings
