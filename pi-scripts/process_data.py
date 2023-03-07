@@ -134,8 +134,8 @@ class Preprocess:
             self._processed_df = pd.concat([self._processed_df, processed_df], axis=0, ignore_index=True)
         
 
-    def get_raw_df(self, timestamp, labels):
-        self.make_raw_df(timestamp=timestamp, labels=labels)
+    def get_raw_df(self):
+        # self.make_raw_df()
         return self._raw_df
 
     def get_processed_df(self, raw_buf_time=None):

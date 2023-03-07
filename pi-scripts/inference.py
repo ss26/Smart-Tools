@@ -31,6 +31,8 @@ num_features = 10
 
 try:
     processed_df = preprocess.get_processed_df(raw_buf_time=15)
+    raw_df = preprocess.get_raw_df()
+    raw_df.to_csv(ROOT_DIR + "/data/test-raw-df.csv", header=raw_df.columns)
     y_preds = []
     for i in range(len(processed_df)):
         tensor = preprocess.get_custom_tensor(processed_df.iloc[i,:])
