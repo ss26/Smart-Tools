@@ -21,25 +21,32 @@ class Preprocess:
     """
 
     def __init__(self):
-        # self.timestamp = ['timestamp']
+        self.timestamp = ['timestamp']
         # add roll, pitch, yaw when needed to self.sensors
-        self.sensors = ['accX', 'accY', 'accZ', 'wx', 'wy',
+        self.sensors = ['roll', 'pitch', 'yaw', 'accX', 'accY', 'accZ', 'wx', 'wy',
                         'wz', 'bx', 'by', 'bz', 'Isens', 'Srms']
         self.stats = ['min', 'max', 'mean', 'kurt', 'sem',
                       'std', 'var', 'skew', 'mad', 'sum']
         self._col_dict = {sensor: None for sensor in self.sensors}
 
+        # self._raw_df = pd.DataFrame(
+        #     [0]*len(self.sensors)).transpose()
+        
         self._raw_df = pd.DataFrame(
-            [0]*len(self.sensors)).transpose()
-        # self._raw_df.columns = self.timestamp + self.sensors
-        self._raw_df.columns = self.sensors
+            [0]*len(self.timestamp + self.sensors + 'Activity')).transpose()
+        
+        # self._raw_df.columns = self.sensors
+        
+        self._raw_df.columns = self.timestamp + self.sensors + 'Activity'
+        
         self._activities = {0: 'Engrave', 1: 'Cut', 2: 'Sand', 3: 'Route'}
 
         self._processed_df = pd.DataFrame()
         self._num_features = len(self.stats)
         self._num_sensors = len(self.sensors)
         self._tensor = None
-        
+        self._sma_window = 59
+
         # self._processed_buffer_time = 1     # time for processed data
         # processed_buffer_time = time.perf_counter() + self._processed_buffer_time
         # while time.perf_counter() <= processed_buffer_time:
@@ -75,12 +82,17 @@ class Preprocess:
         start_time = time.perf_counter()
 
         while time.perf_counter() <= start_time + self._raw_buffer_time:
+            current_sum = 0        
             heading, roll, pitch, accX, accY, accZ, wx, wy, wz, bx, by, bz, isens, mic = data_getter.get_data()
+            for i in range(0, self._sma_window):
+               current_sum += isens
+            current = current_sum/self._sma_window
+            
             if timestamp:
                 col_dict = {
                     'timestamp': time.perf_counter() - start_time, 'roll': roll, 'pitch': pitch, 'yaw': heading,
                     'accX': accX, 'accY': accY, 'accZ': accZ, 'wx': wx, 'wy': wy, 'wz': wz, 'bx': bx,
-                    'by': by, 'bz': bz, 'Isens': isens, 'Srms': mic, 'activity': activity
+                    'by': by, 'bz': bz, 'Isens': current, 'Srms': mic, 'activity': activity
                 }
 
                 self._raw_df = pd.concat([self._raw_df, pd.DataFrame(
@@ -89,7 +101,7 @@ class Preprocess:
             else: 
                 col_dict = {
                     'accX': accX, 'accY': accY, 'accZ': accZ, 'wx': wx, 'wy': wy, 'wz': wz, 'bx': bx,
-                    'by': by, 'bz': bz, 'Isens': isens, 'Srms': mic
+                    'by': by, 'bz': bz, 'Isens': current, 'Srms': mic
                 }
 
                 self._raw_df = pd.concat([self._raw_df, pd.DataFrame(
@@ -134,8 +146,9 @@ class Preprocess:
             self._processed_df = pd.concat([self._processed_df, processed_df], axis=0, ignore_index=True)
         
 
-    def get_raw_df(self):
-        # self.make_raw_df()
+    def get_raw_df(self, make=False, timestamp=False, labels=False, raw_buf_time=None):
+        if make:
+            self.make_raw_df(timestamp=timestamp, labels=labels, raw_buf_time=raw_buf_time)
         return self._raw_df
 
     def get_processed_df(self, raw_buf_time=None):

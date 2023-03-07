@@ -7,7 +7,7 @@ warnings.filterwarnings('ignore')
 
 num_sensors = 11
 
-def make_processed_df(raw_df, activity):
+def make_processed_df(raw_df, activity=None):
     """Copy pasted from process_data for ease of use."""
 
     def mad(df: pd.DataFrame):
@@ -17,6 +17,9 @@ def make_processed_df(raw_df, activity):
     assert raw_df.size != 0, f"Invalid size for dataframe: {raw_df.size}"
     assert len(
         raw_df.columns) == num_sensors, f"Some sensors are missing! Number of sensors detected: {len(raw_df.columns)}. Needed {num_sensors}!"
+
+    if raw_df.shape[0]%590 != 0:
+        raw_df = raw_df.tail((raw_df.shape[0] - raw_df.shape[0]%590))
 
     processed_df = pd.DataFrame()
 
@@ -33,7 +36,7 @@ def make_processed_df(raw_df, activity):
     # return processed_df
 
     # r-pi
-    for i in tqdm(range(0,8260,295)):
+    for i in tqdm(range(0,raw_df.shape[0],295)):
         _processed_df = pd.DataFrame()
         raw_df_buf = raw_df.iloc[i:i+590,:]
         stat_df = raw_df_buf.agg(
@@ -41,7 +44,8 @@ def make_processed_df(raw_df, activity):
         _processed_df = stat_df.unstack().to_frame().T
         _processed_df.columns = _processed_df.columns.map('_'.join)
         processed_df = processed_df.append(_processed_df)
-    processed_df['Activity'] = activity
+    if activity:
+        processed_df['Activity'] = activity
     return processed_df
 
 # for arduino
@@ -80,17 +84,22 @@ def make_processed_df(raw_df, activity):
 # data_filename = '/home/ss26/Projects/Smart-Tools/data/processed_pi_conv_engraving.csv'
 # data_filename = '/home/ss26/Projects/Smart-Tools/data/processed_pi_conv_cutting.csv'
 # data_filename = '/home/ss26/Projects/Smart-Tools/data/processed_pi_conv_sanding.csv'
-data_filename = '/home/ss26/Projects/Smart-Tools/data/processed_pi_conv_routing.csv'
+# data_filename = '/home/ss26/Projects/Smart-Tools/data/processed_pi_conv_routing.csv'
 
 # df = pd.read_csv('/home/ss26/Projects/Smart-Tools/data/compare_pi_conv_engraving.csv')
 # df = pd.read_csv('/home/ss26/Projects/Smart-Tools/data/compare_pi_conv_cutting.csv')
 # df = pd.read_csv('/home/ss26/Projects/Smart-Tools/data/compare_pi_conv_sanding.csv')
-df = pd.read_csv('/home/ss26/Projects/Smart-Tools/data/compare_pi_conv_routing.csv')
+# df = pd.read_csv('/home/ss26/Projects/Smart-Tools/data/compare_pi_conv_routing.csv')
 
 # proc_df = make_processed_df(df, 0)
 # proc_df = make_processed_df(df, 1)
 # proc_df = make_processed_df(df, 2)
-proc_df = make_processed_df(df, 3)
+# proc_df = make_processed_df(df, 3)
 
+# custom dfs
+
+data_filename = '/home/ss26/Projects/Smart-Tools/data/test-raw-df-route-processed.csv'
+df = pd.read_csv('/home/ss26/Projects/Smart-Tools/data/test-raw-df-route.csv')
+proc_df = make_processed_df(df)
 
 proc_df.to_csv(data_filename)
