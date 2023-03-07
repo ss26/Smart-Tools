@@ -24,8 +24,9 @@ try:
             current_sum += isens
         current = current_sum/sma_window
         current /= 10000
+        force = 30.5 * current - 39.9
         
-        text = f"Current: {current} A"
+        text = f"Force: {force} N"
         OLED.print_on_OLED(text)
         
         
