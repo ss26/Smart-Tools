@@ -119,10 +119,11 @@ class Preprocess:
         assert len(
             raw_df.columns) == self._num_sensors, f"Some sensors are missing! Number of sensors detected: {len(raw_df.columns)}. Needed {self._num_sensors}!"
 
-        if raw_df.size%590 != 0:
-            raw_df = raw_df.tail(-raw_df.size%590)
-
-        for i in range(0,raw_df.size, 295):
+        if raw_df.shape[0]%590 != 0:
+            raw_df = raw_df.tail((raw_df.shape[0] - raw_df.shape[0]%590))
+        
+        for i in range(0,raw_df.shape[0], 295):
+            processed_df = pd.DataFrame()
             raw_df_buf = raw_df.iloc[i:i+590,:]
             stat_df = raw_df_buf.agg(
                 ['min', 'max', 'mean', 'kurt', 'sem', 'std', 'var', 'skew', Preprocess.mad, 'sum'])

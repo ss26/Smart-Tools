@@ -22,7 +22,6 @@ font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 16)
 font2 = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 28)
 
 offset = 0  # flips between 0 and 32 for double buffering
-print(dir(oled))
 
 def print_on_OLED(text):
     draw.rectangle((0, 0, oled.width, oled.height * 2), outline=0, fill=0)
