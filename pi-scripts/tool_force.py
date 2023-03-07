@@ -27,7 +27,7 @@ try:
         force = 30.5 * current - 39.9
         force *= 0.2248
         
-        text = f"Force: {force} lbs"
+        text = f"{force} lbf"
         OLED.print_on_OLED(text)
         
         
