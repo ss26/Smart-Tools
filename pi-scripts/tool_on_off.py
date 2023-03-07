@@ -2,20 +2,23 @@ from process_data import Preprocess
 import OLED
 import os
 import warnings
+import get_data
 
 ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
 
 warnings.filterwarnings('ignore')
 
-preprocess = Preprocess()
+data_getter = get_data.DataCollector()
 
-
-
+sma_window = 30
 
 try:
     while True:
-        raw_df = preprocess.get_raw_df(make=True, timestamp=True, labels=True, raw_buf_time=5)
-        current = raw_df['Isens'].mean()
+        current_sum = 0        
+        heading, roll, pitch, accX, accY, accZ, wx, wy, wz, bx, by, bz, isens, mic = data_getter.get_data()
+        for i in range(0, sma_window):
+            current_sum += isens
+        current = current_sum/sma_window
         
         OLED.clear_display()
         
