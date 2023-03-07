@@ -25,8 +25,9 @@ try:
         current = current_sum/sma_window
         current /= 10000
         force = 30.5 * current - 39.9
+        force *= 0.2248
         
-        text = f"Force: {force} N"
+        text = f"Force: {force} lbs"
         OLED.print_on_OLED(text)
         
         
