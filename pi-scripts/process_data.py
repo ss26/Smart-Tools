@@ -73,14 +73,24 @@ class Preprocess:
 
         while time.perf_counter() <= start_time + self._raw_buffer_time:
             heading, roll, pitch, accX, accY, accZ, wx, wy, wz, bx, by, bz, isens, mic = data_getter.get_data()
-            col_dict = {
-                'timestamp': time.perf_counter() - start_time, 'roll': roll, 'pitch': pitch, 'yaw': heading,
-                'accX': accX, 'accY': accY, 'accZ': accZ, 'wx': wx, 'wy': wy, 'wz': wz, 'bx': bx,
-                'by': by, 'bz': bz, 'Isens': isens, 'Srms': mic, 'activity': activity
-            }
+            if timestamp:
+                col_dict = {
+                    'timestamp': time.perf_counter() - start_time, 'roll': roll, 'pitch': pitch, 'yaw': heading,
+                    'accX': accX, 'accY': accY, 'accZ': accZ, 'wx': wx, 'wy': wy, 'wz': wz, 'bx': bx,
+                    'by': by, 'bz': bz, 'Isens': isens, 'Srms': mic, 'activity': activity
+                }
 
-            self._raw_df = pd.concat([self._raw_df, pd.DataFrame(
-                [col_dict.values()], columns=self.timestamp + self.sensors + ['Activity'])], axis=0, ignore_index=True)
+                self._raw_df = pd.concat([self._raw_df, pd.DataFrame(
+                    [col_dict.values()], columns=self.timestamp + self.sensors + ['Activity'])], axis=0, ignore_index=True)
+
+            else: 
+                col_dict = {
+                    'accX': accX, 'accY': accY, 'accZ': accZ, 'wx': wx, 'wy': wy, 'wz': wz, 'bx': bx,
+                    'by': by, 'bz': bz, 'Isens': isens, 'Srms': mic
+                }
+
+                self._raw_df = pd.concat([self._raw_df, pd.DataFrame(
+                    [col_dict.values()], columns=self.sensors)], axis=0, ignore_index=True)
 
         end_time = time.perf_counter()
         print(f"Total elapsed buffer time: {end_time - start_time}")
