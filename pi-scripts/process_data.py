@@ -135,7 +135,7 @@ class Preprocess:
         return self._raw_df
 
     def get_processed_df(self, raw_buf_time=None):
-        self.make_raw_df(raw_buf_time)
+        self.make_raw_df(raw_buf_time=raw_buf_time)
         self.make_processed_df(self._raw_df)
         return self._processed_df
 
