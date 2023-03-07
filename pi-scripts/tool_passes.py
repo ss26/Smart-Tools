@@ -18,6 +18,8 @@ act_start_time = time.time()
 
 num_passes = 0 
 total_times = []
+forces = []
+angles = []
 
 try:
     while time.time() <= act_start_time + buffer_time:
@@ -44,8 +46,11 @@ try:
             stop_time = time.perf_counter()
             num_passes += 1
             total_times += [stop_time - start_time]
+
+        forces += [force]
+        angles += [roll]
     
-    text = f"Num Passes = {num_passes}\nAvg. Time/Pass = {sum(total_times)/len(total_times)} s"
+    text = f"Num Passes = {num_passes}\nAvg. Time/Pass = {sum(total_times)/len(total_times)} s\nAvg. Force = {sum(forces)/len(forces)} lbf\nAvg. Roll Angle = {sum(angles)/len(angles)} deg."
     OLED.print_on_OLED(text)
         
         
