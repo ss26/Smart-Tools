@@ -16,14 +16,17 @@ sma_window = 30
 try:
     while True:
         time.sleep(1)
+        OLED.clear_display()
 
         current_sum = 0        
         heading, roll, pitch, accX, accY, accZ, wx, wy, wz, bx, by, bz, isens, mic = data_getter.get_data()
         for i in range(0, sma_window):
             current_sum += isens
         current = current_sum/sma_window
+        current /= 10000
         
-        OLED.clear_display()
+        text = f"Current: {current} A"
+        OLED.print_on_OLED(text)
         
         
         
