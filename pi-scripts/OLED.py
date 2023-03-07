@@ -26,8 +26,8 @@ offset = 0  # flips between 0 and 32 for double buffering
 
 def print_on_OLED(text):
     draw.rectangle((0, 0, oled.width, oled.height * 2), outline=0, fill=0)
-    pretext = "Task:"
-    draw.text((0, 0), pretext, font=font, fill=255)
+    # pretext = "Task:"
+    # draw.text((0, 0), pretext, font=font, fill=255)
     draw.text((14, 36), text, font=font, fill=255)
     oled.image(image)
     oled.show()
