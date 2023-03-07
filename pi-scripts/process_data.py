@@ -130,7 +130,7 @@ class Preprocess:
             # stat_df = stat_df.transpose()
             processed_df = stat_df.unstack().to_frame().T
             processed_df.columns = processed_df.columns.map('_'.join)
-            self._processed_df.append(processed_df)
+            pd.concat([self._processed_df,processed_df], axis=0, ignore_index=True)
         
 
     def get_raw_df(self, timestamp, labels):
