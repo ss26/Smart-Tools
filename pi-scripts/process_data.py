@@ -22,7 +22,8 @@ class Preprocess:
 
     def __init__(self):
         self.timestamp = ['timestamp']
-        self.sensors = ['roll', 'pitch', 'yaw', 'accX', 'accY', 'accZ', 'wx', 'wy',
+        # add roll, pitch, yaw when needed to self.sensors
+        self.sensors = ['accX', 'accY', 'accZ', 'wx', 'wy',
                         'wz', 'bx', 'by', 'bz', 'Isens', 'Srms']
         self.stats = ['min', 'max', 'mean', 'kurt', 'sem',
                       'std', 'var', 'skew', 'mad', 'sum']
