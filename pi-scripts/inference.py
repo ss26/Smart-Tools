@@ -33,7 +33,7 @@ try:
     processed_df = preprocess.get_processed_df(raw_buf_time=15)
     y_preds = []
     for i in range(len(processed_df)):
-        tensor = preprocess.get_custom_tensor(processed_df[i])
+        tensor = preprocess.get_custom_tensor(processed_df.iloc[i,:])
         tensor = tf.cast(tensor, tf.float32)
         tensor = tf.reshape(tensor, (1, num_sensors, num_features))
         interpreter.set_tensor(input_intp['index'], tensor)
