@@ -1,4 +1,3 @@
-from process_data import Preprocess
 import OLED
 import os
 import warnings
@@ -29,9 +28,8 @@ try:
         
         text = f"{force:.2f} lbf"
         OLED.print_on_OLED(text)
+        print(f"{force:.2f}")
         
         
-        
-
 except KeyboardInterrupt:
     exit()
