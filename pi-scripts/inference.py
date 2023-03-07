@@ -18,7 +18,7 @@ preprocess = Preprocess()
 
 activities = {0: 'Engrave', 1: 'Cut', 2: 'Sand', 3: 'Route'}
 
-tflite_model = ROOT_DIR + '/models/model-pi10mins.tflite.tflite'
+tflite_model = ROOT_DIR + '/models/model-pi10mins.tflite'
 
 interpreter = tf.lite.Interpreter(tflite_model)
 interpreter.allocate_tensors()
