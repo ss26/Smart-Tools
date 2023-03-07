@@ -9,8 +9,8 @@ RESET_PIN = digitalio.DigitalInOut(board.D4)
 i2c = board.I2C()  # uses board.SCL and board.SDA
 # i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 oled = adafruit_ssd1306.SSD1306_I2C(128, 64, i2c, addr=0x3D, reset=RESET_PIN)
-oled.rotation = 2
 
+oled.rotation = 2
 oled.fill(0)
 oled.show()
 
@@ -35,5 +35,6 @@ def print_on_OLED(text):
 
 
 def clear_display():
+    oled.rotation = 2
     oled.fill(0)
     oled.show()
