@@ -64,16 +64,19 @@ try:
     total_times = [x - y for x,y in zip(stop_times, start_times)]
 
     
-    text = f"Num Passes = {len(total_times)}\n"
-    OLED.print_on_OLED(text, y_axis=10)
-    text = f"Avg. Time/Pass = {sum(total_times)/len(total_times)} s"
-    OLED.print_on_OLED(text, y_axis=20)
-    text = f"Avg. Force = {sum(forces)/len(forces)} lbf" 
-    OLED.print_on_OLED(text, y_axis=30)
-    text = f"Avg. Roll Angle = {sum(angles)/len(angles)} deg."
-    OLED.print_on_OLED(text, y_axis=40)
+    while True:
+        text = f"Num Passes = {len(total_times)}\n"
+        OLED.print_on_OLED(text, y_axis=10)
+        text = f"Avg. Time/Pass = {sum(total_times)/len(total_times)} s"
+        OLED.print_on_OLED(text, y_axis=20)
+        text = f"Avg. Force = {sum(forces)/len(forces)} lbf" 
+        OLED.print_on_OLED(text, y_axis=30)
+        text = f"Avg. Roll Angle = {sum(angles)/len(angles)} deg."
+        OLED.print_on_OLED(text, y_axis=40)
+        OLED.OLED_show()
 
-    OLED.OLED_show()
+        time.sleep(1)
+    
     
         
         
