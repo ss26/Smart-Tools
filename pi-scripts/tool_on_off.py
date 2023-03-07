@@ -3,6 +3,7 @@ import OLED
 import os
 import warnings
 import get_data
+import time
 
 ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
 
@@ -14,6 +15,8 @@ sma_window = 30
 
 try:
     while True:
+        time.sleep(1)
+
         current_sum = 0        
         heading, roll, pitch, accX, accY, accZ, wx, wy, wz, bx, by, bz, isens, mic = data_getter.get_data()
         for i in range(0, sma_window):
