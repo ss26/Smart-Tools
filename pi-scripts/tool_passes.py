@@ -17,7 +17,8 @@ buffer_time = int(input("Enter time of activity: "))
 act_start_time = time.time()
 
 num_passes = 0 
-total_times = []
+start_times = []
+stop_times = []
 forces = []
 angles = []
 
@@ -41,15 +42,20 @@ try:
             force = 0
 
         if current > 1.9:
-            start_time = time.perf_counter()
+            start_times += [time.perf_counter()]
         if current < 1.9:
-            stop_time = time.perf_counter()
-            num_passes += 1
-            total_times += [stop_time - start_time]
+            stop_times += [time.perf_counter()]
 
         forces += [force]
         angles += [roll]
     
+    while True:
+        if stop_times[0] < start_times[0]:
+            stop_times = stop_times[1:]
+        else:
+            break
+    assert len(stop_times) == len(start_times)
+    total_times = [x - y for x,y in zip(stop_times, start_times)]
     text = f"Num Passes = {num_passes}\nAvg. Time/Pass = {sum(total_times)/len(total_times)} s\nAvg. Force = {sum(forces)/len(forces)} lbf\nAvg. Roll Angle = {sum(angles)/len(angles)} deg."
     OLED.print_on_OLED(text)
         
