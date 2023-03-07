@@ -37,7 +37,7 @@ class Preprocess:
         
         # self._raw_df.columns = self.sensors
         
-        self._raw_df.columns = self.timestamp + self.sensors + 'Activity'
+        self._raw_df.columns = self.timestamp + self.sensors + ['Activity']
         
         self._activities = {0: 'Engrave', 1: 'Cut', 2: 'Sand', 3: 'Route'}
 
