@@ -34,6 +34,8 @@ try:
             text = "Tool is off"
             OLED.print_on_OLED(text)
         
+        print(current)
+        
 
 except KeyboardInterrupt:
     exit()
