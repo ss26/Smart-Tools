@@ -31,7 +31,7 @@ def print_on_OLED(text):
     draw.text((14, 36), text, font=font2, fill=255)
     oled.image(image)
     oled.show()
-    time.sleep(1)
+    time.sleep(10)
     clear_display()
 
 

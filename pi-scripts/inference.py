@@ -30,7 +30,7 @@ num_sensors = 11
 num_features = 10
 
 try:
-    processed_df = preprocess.get_processed_df(raw_buf_time=60)
+    processed_df = preprocess.get_processed_df(raw_buf_time=30)
     y_preds = []
     for i in range(len(processed_df)):
         tensor = preprocess.get_custom_tensor(processed_df[i])
