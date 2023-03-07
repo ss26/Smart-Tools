@@ -114,14 +114,14 @@ class Preprocess:
         # if not raw_df:
         #     raw_df = self._raw_df
 
-        assert raw_df != 0, f"Invalid size for dataframe: {raw_df.size}"
+        assert raw_df.size != 0, f"Invalid size for dataframe: {raw_df.size}"
         assert len(
             raw_df.columns) == self._num_sensors, f"Some sensors are missing! Number of sensors detected: {len(raw_df.columns)}. Needed {self._num_sensors}!"
 
-        if len(raw_df)%590 != 0:
-            raw_df = raw_df.tail(-len(raw_df)%590)
+        if raw_df.size%590 != 0:
+            raw_df = raw_df.tail(-raw_df.size%590)
 
-        for i in range(0,len(raw_df), 295):
+        for i in range(0,raw_df.size, 295):
             raw_df_buf = raw_df.iloc[i:i+590,:]
             stat_df = raw_df_buf.agg(
                 ['min', 'max', 'mean', 'kurt', 'sem', 'std', 'var', 'skew', Preprocess.mad, 'sum'])
