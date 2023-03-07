@@ -21,7 +21,7 @@ class Preprocess:
     """
 
     def __init__(self):
-        self.timestamp = ['timestamp']
+        # self.timestamp = ['timestamp']
         # add roll, pitch, yaw when needed to self.sensors
         self.sensors = ['accX', 'accY', 'accZ', 'wx', 'wy',
                         'wz', 'bx', 'by', 'bz', 'Isens', 'Srms']
@@ -30,8 +30,9 @@ class Preprocess:
         self._col_dict = {sensor: None for sensor in self.sensors}
 
         self._raw_df = pd.DataFrame(
-            [0]*len(self.timestamp + self.sensors)).transpose()
-        self._raw_df.columns = self.timestamp + self.sensors
+            [0]*len(self.sensors)).transpose()
+        # self._raw_df.columns = self.timestamp + self.sensors
+        self._raw_df.columns = self.sensors
         self._activities = {0: 'Engrave', 1: 'Cut', 2: 'Sand', 3: 'Route'}
 
         self._processed_df = pd.DataFrame()
