@@ -10,7 +10,7 @@ warnings.filterwarnings('ignore')
 
 data_getter = get_data.DataCollector()
 
-sma_window = 90
+sma_window = 120
 
 buffer_time = int(input("Enter time of activity: "))
 
@@ -65,7 +65,7 @@ try:
 
     
     while True:
-        text = f"Num Passes = {len(total_times)}\nAvg. Time/Pass = {sum(total_times)/len(total_times)} s\nAvg. Force = {sum(forces)/len(forces)} lbf\nAvg. Roll Angle = {sum(angles)/len(angles)} deg."
+        text = f"Num Passes = {len(total_times)}\nAvg. Time/Pass = {(sum(total_times)/len(total_times)):.2f} s\nAvg. Force = {(sum(forces)/len(forces)):.2f} lbf\nAvg. Roll Angle = {(sum(angles)/len(angles)):.2f} deg."
         OLED.print_on_OLED(text, y_axis=10)
         
         # OLED.print_on_OLED(text, y_axis=20)
