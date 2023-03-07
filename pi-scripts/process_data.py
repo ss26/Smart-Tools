@@ -50,16 +50,17 @@ class Preprocess:
     #     stats = ['min', 'max', 'mean', 'kurt', 'sem', 'std', 'var', 'skew', 'mad', 'sum']
     #     complete_stats = product(sensors, stats)
 
-    def make_raw_df(self, timestamp=False, labels=False):
+    def make_raw_df(self, timestamp=False, labels=False, raw_buf_time=None):
         """
         CREATES
             One pandas DataFrame containing buffer_time worth raw data
         """
-        self._raw_buffer_time = int(
-            input("How long do you want to run the buffer, in seconds? "))
-        if not isinstance(self._raw_buffer_time, int) and self._raw_buffer_time > 0:
-            self._raw_buffer_time = 5       # time of serial buffer data
-            
+        if isinstance(raw_buf_time, int):
+            self._raw_buffer_time = raw_buf_time       # time of serial buffer data
+        else:
+            self._raw_buffer_time = int(
+                input("How long do you want to run the buffer, in seconds? "))
+                    
         if labels:
             activity = input("What activity are you doing? ")
             activity = list(self._activities.values()).index(activity)
@@ -116,24 +117,35 @@ class Preprocess:
         assert len(
             raw_df.columns) == self._num_sensors, f"Some sensors are missing! Number of sensors detected: {len(raw_df.columns)}. Needed {self._num_sensors}!"
 
-        stat_df = raw_df.agg(
-            ['min', 'max', 'mean', 'kurt', 'sem', 'std', 'var', 'skew', Preprocess.mad, 'sum'])
-        stat_df = stat_df.transpose()
+        if len(raw_df)%590 != 0:
+            raw_df = raw_df.tail(-len(raw_df)%590)
 
-        self._processed_df = stat_df.unstack().to_frame().T
-        self._processed_df.columns = self._processed_df.columns.map('_'.join)
+        for i in range(0,len(raw_df), 295):
+            raw_df_buf = raw_df.iloc[i:i+590,:]
+            stat_df = raw_df_buf.agg(
+                ['min', 'max', 'mean', 'kurt', 'sem', 'std', 'var', 'skew', Preprocess.mad, 'sum'])
+            stat_df = stat_df.transpose()
+            processed_df = stat_df.unstack().to_frame().T
+            processed_df.columns = processed_df.columns.map('_'.join)
+            self._processed_df.append(processed_df)
+        
 
     def get_raw_df(self, timestamp, labels):
         self.make_raw_df(timestamp=timestamp, labels=labels)
         return self._raw_df
 
-    def get_processed_df(self, raw_df):
-        self.make_processed_df(raw_df)
+    def get_processed_df(self, raw_buf_time=None):
+        self.make_raw_df(raw_buf_time)
+        self.make_processed_df(self._raw_df)
         return self._processed_df
 
-    def get_tensor(self):
+    def get_tensor(self,raw_buf_time=None ):
         # no timestamp for inference
-        self.make_raw_df()
+        self.make_raw_df(raw_buf_time)
         self.make_processed_df(self._raw_df)
         tensor_np = self._processed_df.to_numpy()
         return tensor_np
+    
+    @staticmethod
+    def get_custom_tensor(df: pd.DataFrame):
+        return df.to_numpy()

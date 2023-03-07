@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import os
 import time
 from process_data import Preprocess
+from statistics import mode
 import warnings
 import tensorflow as tf
 import OLED
@@ -29,8 +30,10 @@ num_sensors = 11
 num_features = 10
 
 try:
-    while True:
-        tensor = preprocess.get_tensor()
+    processed_df = preprocess.get_processed_df(raw_buf_time=60)
+    y_preds = []
+    for i in range(len(processed_df)):
+        tensor = preprocess.get_custom_tensor(processed_df[i])
         print(tensor)
         tensor = tf.cast(tensor, tf.float32)
         tensor = tf.reshape(tensor, (1, num_sensors, num_features))
@@ -38,10 +41,12 @@ try:
         interpreter.invoke()
         y_pred = np.argmax(interpreter.get_tensor(
             output_intp['index']), axis=1)
+        y_preds += y_pred[0]
 
-        print(f"Predicted Activity: {activities[y_pred[0]]}")
-        OLED.print_on_OLED({activities[y_pred[0]]})
-        time.sleep(1)
+    y_pred_mode = mode(y_preds)
+    print(f"Predicted Activity: {activities[y_pred_mode]}")
+    OLED.print_on_OLED({activities[y_pred_mode]})
+    time.sleep(1)
         
 except KeyboardInterrupt:
     pass
