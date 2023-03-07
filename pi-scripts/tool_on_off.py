@@ -13,12 +13,12 @@ preprocess = Preprocess()
 
 
 try:
-    raw_df = preprocess.get_raw_df(make=True, timestamp=True, labels=True, raw_buf_time=5)
-   
-    current = raw_df['Isens'].mean()
-
     while True:
+        raw_df = preprocess.get_raw_df(make=True, timestamp=True, labels=True, raw_buf_time=5)
+        current = raw_df['Isens'].mean()
+        
         OLED.clear_display()
+        
         if current > 10000 and current < 17000:
             text = "Tool is on"
             OLED.print_on_OLED(text)
