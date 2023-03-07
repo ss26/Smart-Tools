@@ -24,16 +24,18 @@ font2 = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 28
 
 offset = 0  # flips between 0 and 32 for double buffering
 
-def print_on_OLED(text):
+def print_on_OLED(text, y_axis=14):
     draw.rectangle((0, 0, oled.width, oled.height * 2), outline=0, fill=0)
     # pretext = "Task:"
     # draw.text((0, 0), pretext, font=font, fill=255)
-    draw.text((0, 12), text, font=font, fill=255)
-    oled.image(image)
-    oled.show()
+    draw.text((0, y_axis), text, font=font, fill=255)
+    
     # time.sleep(10)
     # clear_display()
 
+def OLED_show():
+    oled.image(image)
+    oled.show()
 
 def clear_display():
     oled.rotate(2)
