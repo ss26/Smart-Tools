@@ -33,7 +33,7 @@ class Preprocess:
         #     [0]*len(self.sensors)).transpose()
         
         self._raw_df = pd.DataFrame(
-            [0]*len(self.timestamp + self.sensors + 'Activity')).transpose()
+            [0]*len(self.timestamp + self.sensors + ['Activity'])).transpose()
         
         # self._raw_df.columns = self.sensors
         
