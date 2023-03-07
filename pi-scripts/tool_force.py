@@ -26,9 +26,12 @@ try:
         force = 30.5 * current - 39.9
         force *= 0.2248
         
+        if force < 2.5:
+            force = 0
+        
         text = f"{force:.2f} lbf"
         OLED.print_on_OLED(text)
-        print(f"{force:.2f}")
+        # print(f"{force:.2f}")
         
         
 except KeyboardInterrupt:
