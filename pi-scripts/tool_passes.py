@@ -54,7 +54,11 @@ try:
             stop_times = stop_times[1:]
         else:
             break
-    assert len(stop_times) == len(start_times)
+    
+    if not len(stop_times) == len(start_times):
+        start_times_len = len(start_times)
+        stop_times = stop_times[:start_times_len]
+
     total_times = [x - y for x,y in zip(stop_times, start_times)]
     text = f"Num Passes = {num_passes}\nAvg. Time/Pass = {sum(total_times)/len(total_times)} s\nAvg. Force = {sum(forces)/len(forces)} lbf\nAvg. Roll Angle = {sum(angles)/len(angles)} deg."
     OLED.print_on_OLED(text)
