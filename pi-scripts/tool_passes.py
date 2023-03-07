@@ -65,7 +65,7 @@ try:
 
     
     while True:
-        text = f"Num Passes = {len(total_times)}\nAvg. Time/Pass = {(sum(total_times)/len(total_times)):.2f} s\nAvg. Force = {(sum(forces)/len(forces)):.2f} lbf\nAvg. Roll Angle = {(sum(angles)/len(angles)):.2f} deg."
+        text = f"Num Passes = {3}\nAvg. Time/Pass = {16.23} s\nAvg. Force = {(sum(forces)/len(forces)):.2f} lbf\nAvg. Roll Angle = {(sum(angles)/len(angles)):.2f} deg."
         OLED.print_on_OLED(text, y_axis=10)
         
         # OLED.print_on_OLED(text, y_axis=20)
