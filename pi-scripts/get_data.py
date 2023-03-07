@@ -14,10 +14,10 @@ class DataCollector:
     def __init__(self):
         self.bno = BNO055.BNO055(serial_port='/dev/serial0', rst=18)
         self.spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
-        self.cs = digitalio.DigitalInOut(board.D22)
+        self.cs = digitalio.DigitalInOut(board.D21)
         self.mcp = MCP.MCP3008(self.spi, self.cs)
-        self.current = AnalogIn(self.mcp, MCP.P0)
-        self.mic = AnalogIn(self.mcp, MCP.P1)
+        self.current = AnalogIn(self.mcp, MCP.P1)
+        self.mic = AnalogIn(self.mcp, MCP.P0)
         
         if len(sys.argv) == 2 and sys.argv[1].lower() == '-v':
             logging.basicConfig(level=logging.DEBUG)

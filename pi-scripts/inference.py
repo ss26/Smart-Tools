@@ -30,7 +30,7 @@ num_sensors = 11
 num_features = 10
 
 try:
-    processed_df = preprocess.get_processed_df(raw_buf_time=15)
+    processed_df = preprocess.get_processed_df(raw_buf_time=30)
     raw_df = preprocess.get_raw_df()
     raw_df.to_csv(ROOT_DIR + "/data/test-raw-df.csv", header=raw_df.columns)
     y_preds = []
@@ -43,7 +43,7 @@ try:
         y_pred = np.argmax(interpreter.get_tensor(
             output_intp['index']), axis=1)
         print(f"y_pred: {y_pred[0]}")
-        y_preds += y_pred[0]
+        y_preds += [y_pred[0]]
 
     y_pred_mode = mode(y_preds)
     print(f"Predicted Activity: {activities[y_pred_mode]}")
