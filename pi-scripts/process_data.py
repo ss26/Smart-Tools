@@ -111,8 +111,8 @@ class Preprocess:
             One pandas dataframe row containing the following statistics across self.sensors:
             - min, max, mean, kurtosis, sem, std, variance, skew, mad, sum
         """
-        if not raw_df:
-            raw_df = self._raw_df
+        # if not raw_df:
+        #     raw_df = self._raw_df
 
         assert raw_df != 0, f"Invalid size for dataframe: {raw_df.size}"
         assert len(
