@@ -11,6 +11,6 @@ data_filename = input('Enter filename to store data: ')
 
 data_filename = DATA_DIR + data_filename + '.csv'
 
-df = preprocess.get_raw_df(timestamp=True, labels=True)
+df = preprocess.get_raw_df(make=True, timestamp=True, labels=True, raw_buf_time=None)
 
 df.to_csv(data_filename, header=df.columns)
