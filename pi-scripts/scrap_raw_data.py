@@ -8,9 +8,11 @@ warnings.filterwarnings('ignore')
 ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
 
 
-def make_processed_df(raw_df, activity=None):
+def make_processed_df(raw_df_path, activity=None):
     """Copy pasted from process_data for ease of use."""
     num_sensors = 11
+
+    raw_df = pd.read_csv(raw_df_path)
 
     def mad(df: pd.DataFrame):
         return (df - df.mean()).abs().mean()
@@ -26,16 +28,29 @@ def make_processed_df(raw_df, activity=None):
 
     processed_df = pd.DataFrame()
 
-    # ar
-    for i in tqdm(range(0, 13520, 520)):
-        _processed_df = pd.DataFrame()
-        raw_df_buf = raw_df.iloc[i:i+1040, :]
-        stat_df = raw_df_buf.agg(
-            ['min', 'max', 'mean', 'kurt', 'sem', 'std', 'var', 'skew', mad, 'sum'])
-        _processed_df = stat_df.unstack().to_frame().T
-        _processed_df.columns = _processed_df.columns.map('_'.join)
-        processed_df = processed_df.append(_processed_df)
-    processed_df['Activity'] = activity
+    activities = {'E': 0, 'C': 1, 'S': 2, 'R': 3}
+    
+    # smoothen data
+    window = int(0.25*104)
+    raw_df = raw_df.rolling(window=window).mean().dropna().reset_index(drop=True)
+
+    processed_df = raw_df
+    # # ar
+    # for i in tqdm(range(0, 13520, 520)):
+    #     _processed_df = pd.DataFrame()
+    #     raw_df_buf = raw_df.iloc[i:i+1040, :]
+        
+    #     raw
+        # stat_df = raw_df_buf.agg(
+        #     ['min', 'max', 'mean', 'kurt', 'sem', 'std', 'var', 'skew', mad, 'sum'])
+        # _processed_df = stat_df.unstack().to_frame().T
+        # _processed_df.columns = _processed_df.columns.map('_'.join)
+        # processed_df = processed_df.append(_processed_df)
+    
+    try:
+        processed_df['Activity'] = activities[raw_df_path[-15]]
+    except KeyError:
+        print(raw_df_path[-15])
 
     return processed_df
 
@@ -50,12 +65,23 @@ def main():
     data_folder_root = ROOT_DIR + '/data/raw_data/'
 
     for folder in raw_data_folders:
-        for _, _, files in os.walk(data_folder_root + folder):
-            paths_list += [filename for filename in files if filename[-4:] == csv_format]
+        for root, _, files in os.walk(data_folder_root + folder):
+            paths_list += [root + '/' + filename for filename in files if filename[-4:] == csv_format]
 
-    paths_list = list(set(paths_list))
+    paths_list = list(set(paths_list)) 
     
-    print(len(paths_list))
+    mega_processed_df = pd.DataFrame()
+
+    for path in tqdm(paths_list):
+        processed_df = make_processed_df(path)
+        mega_processed_df = pd.concat([mega_processed_df, processed_df], ignore_index=True)
+    
+    print(mega_processed_df.shape)
+
+    mega_processed_df.to_csv('/home/ss26/Projects/Smart-Tools/data/F2021_processed.csv')
+
+    if os.path.exists('/home/ss26/Projects/Smart-Tools/data/F2021_processed.csv'):
+        print("Successfully created processed dataframe of Fall 2021 raw data!")
 
 if __name__ == '__main__':
     main()
