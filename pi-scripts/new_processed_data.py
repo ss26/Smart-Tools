@@ -1,6 +1,7 @@
 import pandas as pd
 from tqdm import tqdm 
 import warnings
+import os
 
 warnings.filterwarnings('ignore')
 
@@ -23,30 +24,32 @@ def make_processed_df(raw_df, activity=None):
 
     processed_df = pd.DataFrame()
 
-    # ar
-    # for i in tqdm(range(0,13520,520)):
-    #     _processed_df = pd.DataFrame()
-    #     raw_df_buf = raw_df.iloc[i:i+1040,:]
-    #     stat_df = raw_df_buf.agg(
-    #         ['min', 'max', 'mean', 'kurt', 'sem', 'std', 'var', 'skew', mad, 'sum'])        
-    #     _processed_df = stat_df.unstack().to_frame().T
-    #     _processed_df.columns = _processed_df.columns.map('_'.join)
-    #     processed_df = processed_df.append(_processed_df)
-    # processed_df['Activity'] = activity
-    # return processed_df
+    activities =    
 
-    # r-pi
-    for i in tqdm(range(0,raw_df.shape[0],295)):
+    # ar
+    for i in tqdm(range(0,13520,520)):
         _processed_df = pd.DataFrame()
-        raw_df_buf = raw_df.iloc[i:i+590,:]
+        raw_df_buf = raw_df.iloc[i:i+1040,:]
         stat_df = raw_df_buf.agg(
             ['min', 'max', 'mean', 'kurt', 'sem', 'std', 'var', 'skew', mad, 'sum'])        
         _processed_df = stat_df.unstack().to_frame().T
         _processed_df.columns = _processed_df.columns.map('_'.join)
         processed_df = processed_df.append(_processed_df)
-    if activity:
-        processed_df['Activity'] = activity
+    processed_df['Activity'] = activity
     return processed_df
+
+    # r-pi
+    # for i in tqdm(range(0,raw_df.shape[0],295)):
+    #     _processed_df = pd.DataFrame()
+    #     raw_df_buf = raw_df.iloc[i:i+590,:]
+    #     stat_df = raw_df_buf.agg(
+    #         ['min', 'max', 'mean', 'kurt', 'sem', 'std', 'var', 'skew', mad, 'sum'])        
+    #     _processed_df = stat_df.unstack().to_frame().T
+    #     _processed_df.columns = _processed_df.columns.map('_'.join)
+    #     processed_df = processed_df.append(_processed_df)
+    # if activity:
+    #     processed_df['Activity'] = activity
+    # return processed_df
 
 # for arduino
 # data_filename = '/home/ss26/Projects/Smart-Tools/data/processed_ar_engraving.csv'
@@ -98,8 +101,22 @@ def make_processed_df(raw_df, activity=None):
 
 # custom dfs
 
-data_filename = '/home/ss26/Projects/Smart-Tools/data/test-raw-df-route-processed.csv'
-df = pd.read_csv('/home/ss26/Projects/Smart-Tools/data/test-raw-df-route.csv')
-proc_df = make_processed_df(df)
+data_folder = '/home/ss26/Projects/Smart-Tools/data/Arduino_Yaskawa'
+processed_filename = '/home/ss26/Projects/Smart-Tools/data/S2023_Yaskawa_Processed.csv'
 
-proc_df.to_csv(data_filename)
+data_filenames = []
+csv_format = '.csv'
+
+for root, dirs, files in os.walk(data_folder):
+    data_filenames += [filename for filename in files if filename[-4:] == csv_format]
+
+data_filenames = list(set(data_filenames))
+
+processed_df = pd.DataFrame()
+
+for filename in data_filenames:
+    raw_df = pd.read_csv(filename)
+    proc_df = make_processed_df(raw_df)
+    processed_df = pd.concat([processed_df, proc_df], ignore_index=True, )
+
+processed_df.to_csv(processed_filename)
