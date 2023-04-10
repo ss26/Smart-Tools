@@ -32,6 +32,8 @@ try:
         text = f"{force:.2f} lbf"
         print(text)
         OLED.print_on_OLED(text)
+        OLED.OLED_show()
+        OLED.clear_display()
         # print(f"{force:.2f}")
         
         
