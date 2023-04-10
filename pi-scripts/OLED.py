@@ -28,7 +28,7 @@ def print_on_OLED(text, y_axis=14):
     draw.rectangle((0, 0, oled.width, oled.height * 2), outline=0, fill=0)
     # pretext = "Task:"
     # draw.text((0, 0), pretext, font=font, fill=255)
-    draw.text((0, y_axis), text, font=font2, fill=255)
+    draw.text((0, y_axis), text, font=font, fill=255)
     
     # time.sleep(10)
     # clear_display()
