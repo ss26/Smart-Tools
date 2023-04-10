@@ -38,6 +38,6 @@ def OLED_show():
     oled.show()
 
 def clear_display():
-    # oled.rotate(2)
+    oled.rotate(2)
     oled.fill(0)
     oled.show()
