@@ -20,7 +20,7 @@ draw = ImageDraw.Draw(image)
 
 # Load a font in 2 different sizes.
 font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 8)
-font2 = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 28)
+font2 = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 22)
 
 offset = 0  # flips between 0 and 32 for double buffering
 
