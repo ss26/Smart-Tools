@@ -22,5 +22,5 @@ chan1 = AnalogIn(mcp, MCP.P1)
 
 while True:
  
-    print("mic: ", chan0.value)
+    #print("mic: ", chan0.value)
     print("current: ", chan1.value)
