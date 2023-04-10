@@ -30,6 +30,7 @@ try:
             force = 0
         
         text = f"{force:.2f} lbf"
+        print(text)
         OLED.print_on_OLED(text)
         # print(f"{force:.2f}")
         
