@@ -24,29 +24,29 @@ def make_processed_df(raw_df, activity=None):
     processed_df = pd.DataFrame()
 
     # ar
-    # for i in tqdm(range(0,13520,520)):
-    #     _processed_df = pd.DataFrame()
-    #     raw_df_buf = raw_df.iloc[i:i+1040,:]
-    #     stat_df = raw_df_buf.agg(
-    #         ['min', 'max', 'mean', 'kurt', 'sem', 'std', 'var', 'skew', mad, 'sum'])        
-    #     _processed_df = stat_df.unstack().to_frame().T
-    #     _processed_df.columns = _processed_df.columns.map('_'.join)
-    #     processed_df = processed_df.append(_processed_df)
-    # processed_df['Activity'] = activity
-    # return processed_df
-
-    # r-pi
-    for i in tqdm(range(0,raw_df.shape[0],295)):
+    for i in tqdm(range(0,13520,520)):
         _processed_df = pd.DataFrame()
-        raw_df_buf = raw_df.iloc[i:i+590,:]
+        raw_df_buf = raw_df.iloc[i:i+1040,:]
         stat_df = raw_df_buf.agg(
             ['min', 'max', 'mean', 'kurt', 'sem', 'std', 'var', 'skew', mad, 'sum'])        
         _processed_df = stat_df.unstack().to_frame().T
         _processed_df.columns = _processed_df.columns.map('_'.join)
         processed_df = processed_df.append(_processed_df)
-    if activity:
-        processed_df['Activity'] = activity
+    processed_df['Activity'] = activity
     return processed_df
+
+    # r-pi
+    # for i in tqdm(range(0,raw_df.shape[0],295)):
+    #     _processed_df = pd.DataFrame()
+    #     raw_df_buf = raw_df.iloc[i:i+590,:]
+    #     stat_df = raw_df_buf.agg(
+    #         ['min', 'max', 'mean', 'kurt', 'sem', 'std', 'var', 'skew', mad, 'sum'])        
+    #     _processed_df = stat_df.unstack().to_frame().T
+    #     _processed_df.columns = _processed_df.columns.map('_'.join)
+    #     processed_df = processed_df.append(_processed_df)
+    # if activity:
+    #     processed_df['Activity'] = activity
+    # return processed_df
 
 # for arduino
 # data_filename = '/home/ss26/Projects/Smart-Tools/data/processed_ar_engraving.csv'
@@ -97,9 +97,10 @@ def make_processed_df(raw_df, activity=None):
 # proc_df = make_processed_df(df, 3)
 
 # custom dfs
+filename = '/home/ss26/Projects/Smart-Tools/data/F2021_Human_Smoothened_Cleaned.parquet' 
 
-data_filename = '/home/ss26/Projects/Smart-Tools/data/test-raw-df-route-processed.csv'
-df = pd.read_csv('/home/ss26/Projects/Smart-Tools/data/test-raw-df-route.csv')
+processed_filename = '/home/ss26/Projects/Smart-Tools/data/F2021_Human_Smoothened_Cleaned_Processed.parquet'
+df = pd.read_parquet(filename)
 proc_df = make_processed_df(df)
 
-proc_df.to_csv(data_filename)
+proc_df.to_parquet(processed_filename)
