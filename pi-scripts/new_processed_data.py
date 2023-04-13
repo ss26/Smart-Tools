@@ -24,7 +24,7 @@ def make_processed_df(raw_df, activity=None):
     processed_df = pd.DataFrame()
 
     # ar
-    for i in tqdm(range(0,13520,520)):
+    for i in tqdm(range(0,raw_df.shape[0],520)):
         _processed_df = pd.DataFrame()
         raw_df_buf = raw_df.iloc[i:i+1040,:]
         stat_df = raw_df_buf.agg(
@@ -97,10 +97,10 @@ def make_processed_df(raw_df, activity=None):
 # proc_df = make_processed_df(df, 3)
 
 # custom dfs
-filename = '/home/ss26/Projects/Smart-Tools/data/F2021_Human_Smoothened_Cleaned.parquet' 
+filename = '/home/ss26/Projects/Smart-Tools/data/F2021_3.parquet' 
 
-processed_filename = '/home/ss26/Projects/Smart-Tools/data/F2021_Human_Smoothened_Cleaned_Processed.parquet'
+processed_filename = '/home/ss26/Projects/Smart-Tools/data/F2021_Processed_3.parquet'
 df = pd.read_parquet(filename)
-proc_df = make_processed_df(df)
+proc_df = make_processed_df(df, activity=3)
 
 proc_df.to_parquet(processed_filename)
