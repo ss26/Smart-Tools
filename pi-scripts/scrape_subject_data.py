@@ -62,11 +62,16 @@ def main():
     paths_list = []
 
     csv_format = '.csv'
-    data_folder_root = ROOT_DIR + '/data/raw_data/'
+    data_folder_root = ROOT_DIR + '/data/Arduino_Human/'
+
+    # test_names = ['test_burzin', 'test_elena', 'test_jose', 'test_kathy', 'test_pablo']
 
     for folder in raw_data_folders:
-        for root, _, files in os.walk(data_folder_root + folder):
-            paths_list += [root + '/' + filename for filename in files if filename[-4:] == csv_format]
+        for root, directory, files in os.walk(data_folder_root + folder):
+            paths_list += [root + '/' + filename for filename in files if (filename[-4:] == csv_format and root[-6:] == 'Burzin')]
+            # paths_list += [filename for filename in files if filename[-4:] == csv_format and ]
+        
+    
 
     paths_list = list(set(paths_list)) 
     
@@ -78,10 +83,10 @@ def main():
     
     print(mega_processed_df.shape)
 
-    mega_processed_df.to_csv('/home/ss26/Projects/Smart-Tools/data/F2021_processed.csv')
+    mega_processed_df.to_parquet('/home/ss26/Projects/Smart-Tools/data/F2021_testBurzin_processed.parquet')
 
-    if os.path.exists('/home/ss26/Projects/Smart-Tools/data/F2021_processed.csv'):
-        print("Successfully created processed dataframe of Fall 2021 raw data!")
+    if os.path.exists('/home/ss26/Projects/Smart-Tools/data/F2021_testBurzin_processed.parquet'):
+        print("Successfully created processed dataframe of Fall 2021 raw data, test Burzin!")
 
 if __name__ == '__main__':
     main()

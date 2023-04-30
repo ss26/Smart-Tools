@@ -142,7 +142,7 @@ def plot_data_vs_logloss(percents, lls, title):
     # plt.savefig("/home/ss26/Projects/Smart-Tools/progress/apr5/lls_vs_data/" + title + ".png", dpi=600)
 
 
-def main():
+def main(SEED):
 
     BATCH_SIZE = 64
     SHUFFLE_BUFFER_SIZE = 100
@@ -175,133 +175,133 @@ def main():
 
     num_activities = 4
 
-    SEEDS = [42, 43, 44, 45, 46]
+    # title = f"Human trained + no pretraining (Seed: {SEED})"
+    title = f"Human trained + Yaskawa pretraining (Seed: {SEED})"
 
-    for SEED in SEEDS:
+    for percent in tqdm(data_percents_human):
 
-        random.seed(SEED)
+        train_df_human_percent = get_activity_df(train_df_human, percent)
+        # train_df_yaskawa_percent = get_activity_df(train_df_yaskawa, percent*(1/4))
+        # val_df_percent = get_activity_df(val_df, percent)
+        # test_df_percent = get_activity_df(test_df, percent)
 
-        # title = f"Human trained + no pretraining (Seed: {SEED})"
-        title = f"Human trained + Yaskawa pretraining (Seed: {SEED})"
+        train_test_val_df_dict = OrderedDict()
+        train_test_val_df_dict['train'] = train_df_human_percent
+        # train_test_val_df_dict['train'] = pd.concat([train_df_human_percent, train_df_yaskawa_percent], ignore_index=True)
+        train_test_val_df_dict['val'] = val_df_human
+        train_test_val_df_dict['test'] = test_df_human
 
-        for percent in tqdm(data_percents_human):
+        tf_dataset_dict = OrderedDict()
 
-            train_df_human_percent = get_activity_df(train_df_human, percent)
-            # train_df_yaskawa_percent = get_activity_df(train_df_yaskawa, percent*(1/4))
-            # val_df_percent = get_activity_df(val_df, percent)
-            # test_df_percent = get_activity_df(test_df, percent)
+        # min, max, mean etc.
+        num_features = 10
+        num_sensors = int(len(x_features_columns)/num_features)
 
-            train_test_val_df_dict = OrderedDict()
-            train_test_val_df_dict['train'] = train_df_human_percent
-            # train_test_val_df_dict['train'] = pd.concat([train_df_human_percent, train_df_yaskawa_percent], ignore_index=True)
-            train_test_val_df_dict['val'] = val_df_human
-            train_test_val_df_dict['test'] = test_df_human
+        for data_split, data_df in train_test_val_df_dict.items():
 
-            tf_dataset_dict = OrderedDict()
+            data_x_np, data_y_np, data_x_df, data_y_df = get_xy_numpy(
+                data_df, x_features_columns, y_features_columns=y_features_columns)
 
-            # min, max, mean etc.
-            num_features = 10
-            num_sensors = int(len(x_features_columns)/num_features)
+            quantile_list = [.001, 0.25, 0.5, 0.75, 0.999]
 
-            for data_split, data_df in train_test_val_df_dict.items():
+            # only for training data, get the above quantiles for ALL COLUMNS and save to a csv
+            if data_split == 'train':
+                # do not use sklearn, instead save the following quantiles of data to a dataframe and store as a csv
+                train_quantile_df = data_x_df.quantile(quantile_list)
+                # train_quantile_df.to_csv('/home/ss26/Projects/Smart-Tools/notebooks/outputs/yaskawa/train_normalization_quantiles.csv')
 
-                data_x_np, data_y_np, data_x_df, data_y_df = get_xy_numpy(
-                    data_df, x_features_columns, y_features_columns=y_features_columns)
+            # for all data, scale each column using the same PER-COLUMN scaling as the training data for uniformity
+            normalized_data_x_df = data_x_df.copy()
+            for feature_name in data_x_df.columns:
 
-                quantile_list = [.001, 0.25, 0.5, 0.75, 0.999]
+                # do not use absolute min, max due to OUTLIERS!
+                min_value = train_quantile_df[feature_name][quantile_list[0]]
+                max_value = train_quantile_df[feature_name][quantile_list[-1]]
 
-                # only for training data, get the above quantiles for ALL COLUMNS and save to a csv
-                if data_split == 'train':
-                    # do not use sklearn, instead save the following quantiles of data to a dataframe and store as a csv
-                    train_quantile_df = data_x_df.quantile(quantile_list)
-                    # train_quantile_df.to_csv('/home/ss26/Projects/Smart-Tools/notebooks/outputs/yaskawa/train_normalization_quantiles.csv')
+                normalized_data_x_df[feature_name] = (
+                    data_x_df[feature_name] - min_value) / (max_value - min_value)
 
-                # for all data, scale each column using the same PER-COLUMN scaling as the training data for uniformity
-                normalized_data_x_df = data_x_df.copy()
-                for feature_name in data_x_df.columns:
+        # now actually transform the training data
+            data_x_np_scaled = normalized_data_x_df.to_numpy()
 
-                    # do not use absolute min, max due to OUTLIERS!
-                    min_value = train_quantile_df[feature_name][quantile_list[0]]
-                    max_value = train_quantile_df[feature_name][quantile_list[-1]]
+            # BATCH_SIZE x NUM_SENSORS x NUM_FEATURES
+            # view this as an image with 1 channel, NUM_SENSORS x NUM_FEATURES size
 
-                    normalized_data_x_df[feature_name] = (
-                        data_x_df[feature_name] - min_value) / (max_value - min_value)
+            reshaped_data_x_np_scaled = data_x_np_scaled.reshape(
+                [-1, num_sensors, num_features])
 
-            # now actually transform the training data
-                data_x_np_scaled = normalized_data_x_df.to_numpy()
+            # get a tensorflow dataset
+            tf_dataset = tf.data.Dataset.from_tensor_slices(
+                (reshaped_data_x_np_scaled, data_y_np))
 
-                # BATCH_SIZE x NUM_SENSORS x NUM_FEATURES
-                # view this as an image with 1 channel, NUM_SENSORS x NUM_FEATURES size
+            # load the tensorflow dataset
+            tf_dataset_dict[data_split] = tf_dataset
 
-                reshaped_data_x_np_scaled = data_x_np_scaled.reshape(
-                    [-1, num_sensors, num_features])
+        train_data = tf_dataset_dict['train'].shuffle(
+            SHUFFLE_BUFFER_SIZE).batch(BATCH_SIZE)
+        val_data = tf_dataset_dict['val'].batch(BATCH_SIZE)
+        test_data = tf_dataset_dict['test'].batch(BATCH_SIZE)
 
-                # get a tensorflow dataset
-                tf_dataset = tf.data.Dataset.from_tensor_slices(
-                    (reshaped_data_x_np_scaled, data_y_np))
+        # find the number of batches in the TESTING dataset
+        # this is useful later
+        test_len = 0
+        for batch in test_data:
+            test_len += 1
 
-                # load the tensorflow dataset
-                tf_dataset_dict[data_split] = tf_dataset
+        # 1D CNN model
+        model_base_dir = "/home/ss26/Projects/Smart-Tools/notebooks/outputs/" + title + "/model"
+        base_dir = "/home/ss26/Projects/Smart-Tools/notebooks/outputs/" + title
 
-            train_data = tf_dataset_dict['train'].shuffle(
-                SHUFFLE_BUFFER_SIZE).batch(BATCH_SIZE)
-            val_data = tf_dataset_dict['val'].batch(BATCH_SIZE)
-            test_data = tf_dataset_dict['test'].batch(BATCH_SIZE)
+        if not os.path.isdir(model_base_dir):
+            os.makedirs(model_base_dir)
+        else:
+            shutil.rmtree(model_base_dir)
 
-            # find the number of batches in the TESTING dataset
-            # this is useful later
-            test_len = 0
-            for batch in test_data:
-                test_len += 1
+        # model, model_path = build_1D_CNN(model_base_dir, model_name='1DCNN',
+            # num_sensors=num_sensors, num_features=num_features, num_outputs=num_activities)
 
-            # 1D CNN model
-            model_base_dir = "/home/ss26/Projects/Smart-Tools/notebooks/outputs/" + title + "/model"
-            base_dir = "/home/ss26/Projects/Smart-Tools/notebooks/outputs/" + title
+        model = tf.keras.models.load_model(
+            '/home/ss26/Projects/Smart-Tools/models/yaskawa_pretrained_dropout')
 
-            if not os.path.isdir(model_base_dir):
-                os.makedirs(model_base_dir)
-            else:
-                shutil.rmtree(model_base_dir)
+        # when we train, we save a csv of the training accuracy/loss
+        csv_logger = tf.keras.callbacks.CSVLogger(
+            base_dir + '/training.log')
 
-            # model, model_path = build_1D_CNN(model_base_dir, model_name='1DCNN',
-                                            #  num_sensors=num_sensors, num_features=num_features, num_outputs=num_activities)
+        # how long we train, set up model with loss function
+        # do 50 for convergence, do 5 to test code
+        model.compile(optimizer="adam",
+                      loss="sparse_categorical_crossentropy",
+                      metrics=["accuracy"])
 
-            model = tf.keras.models.load_model('/home/ss26/Projects/Smart-Tools/models/yaskawa_pretrained_dropout')
+        # now, finally start training
+        model.fit(train_data,
+                  epochs=epochs,
+                  validation_data=val_data,
+                  callbacks=[csv_logger], verbose=0)
 
-            # when we train, we save a csv of the training accuracy/loss
-            csv_logger = tf.keras.callbacks.CSVLogger(
-                base_dir + '/training.log')
+        loss, acc, ll = get_preds(
+            test_data, test_df_human, model, f'{percent*100}% of data')
+        losses += [loss]
+        accs += [acc]
+        loglosses += [ll]
 
-            # how long we train, set up model with loss function
-            # do 50 for convergence, do 5 to test code
-            model.compile(optimizer="adam",
-                          loss="sparse_categorical_crossentropy",
-                          metrics=["accuracy"])
+    # plot_data_vs_acc(data_percents_human, accs, title)
+    # plot_data_vs_logloss(data_percents_human, loglosses, title)
 
-            # now, finally start training
-            model.fit(train_data,
-                      epochs=epochs,
-                      validation_data=val_data,
-                      callbacks=[csv_logger], verbose=0)
+    metrics = pd.DataFrame(list(zip(data_percents_human, accs, loglosses)), columns=[
+        "percent", "accuracy", "logloss"])
+    metrics.to_csv(
+        "/home/ss26/Projects/Smart-Tools/progress/apr5/" + title + ".csv")
 
-            loss, acc, ll = get_preds(
-                test_data, test_df_human, model, f'{percent*100}% of data')
-            losses += [loss]
-            accs += [acc]
-            loglosses += [ll]
+    print(f"Saved metrics of " + title + "!")
 
-        # plot_data_vs_acc(data_percents_human, accs, title)
-        # plot_data_vs_logloss(data_percents_human, loglosses, title)
-
-        metrics = pd.DataFrame(list(zip(data_percents_human, accs, loglosses)), columns=[
-                               "percent", "accuracy", "logloss"])
-        metrics.to_csv(
-            "/home/ss26/Projects/Smart-Tools/progress/apr5/" + title + ".csv")
-        
-        print(f"Saved metrics of " + title + "!")
-    
     print("End of experiment")
 
 
 if __name__ == '__main__':
-    main()
+
+    SEEDS = [42, 43, 44, 45, 46]
+
+    for SEED in SEEDS:
+        tf.keras.utils.set_random_seed(SEED)
+        main(SEED)
