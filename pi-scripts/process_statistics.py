@@ -97,10 +97,27 @@ def make_processed_df(raw_df, activity=None):
 # proc_df = make_processed_df(df, 3)
 
 # custom dfs
-filename = '/home/ss26/Projects/Smart-Tools/data/F2021_3.parquet' 
+subject_name = "Sandeep"
+activity_number_range = range(0,4,1)
 
-processed_filename = '/home/ss26/Projects/Smart-Tools/data/F2021_Processed_3.parquet'
-df = pd.read_parquet(filename)
-proc_df = make_processed_df(df, activity=3)
+for activity_number in activity_number_range:
+    minus_title = "F2021_minus" + subject_name + f"_{activity_number}.parquet"
+    test_title = "F2021_test" + subject_name + f"_{activity_number}.parquet"
+    processed_minus_title = "F2021_processed_minus" + subject_name + f"_{activity_number}.parquet"
+    processed_test_title = "F2021_processed_test" + subject_name + f"_{activity_number}.parquet"
 
-proc_df.to_parquet(processed_filename)
+    filename = '/home/ss26/Projects/Smart-Tools/data/' + minus_title 
+    test_filename = '/home/ss26/Projects/Smart-Tools/data/' + test_title 
+    processed_filename = '/home/ss26/Projects/Smart-Tools/data/' + processed_minus_title
+    processed_test_filename = '/home/ss26/Projects/Smart-Tools/data/' + processed_test_title
+
+    df = pd.read_parquet(filename)
+    proc_df = make_processed_df(df, activity=activity_number)
+
+    test_df = pd.read_parquet(test_filename)
+    test_proc_df = make_processed_df(test_df, activity=activity_number)
+
+    proc_df.to_parquet(processed_filename)
+    test_proc_df.to_parquet(processed_test_filename)
+
+    print(f"Done processing for subject {subject_name} for activity {activity_number}!")
