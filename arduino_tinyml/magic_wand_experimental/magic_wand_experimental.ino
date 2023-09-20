@@ -110,7 +110,6 @@ double a;
 constexpr int label_count = 4;
 const char* labels[label_count] = {"engrave", "cut", "route", "sand"};
 
-double count = 0;
 
 // float f[] PROGMEM = {0.017452, 3.14159};
 
@@ -118,90 +117,109 @@ float normed_data;
 float min_val;
 float max_val;
 
+int count;
+float correct_guesses = 0;
+float incorrect_guesses = 0;
+float percent;
+float label;
+
 void loop() {
+  
+  // else{
+  //   count = 0;
+  // }
 
-    Serial.print("================================\n");
-    // float f = pgm_read_float(&arr[0]);
-    for(int i=0; i < 111; i++)
-    {
-      Serial.print(pgm_read_float(&data_arr[i]),6);
-      Serial.print(", ");
+  // Attempt to read new data from the accelerometer.
+  // bool got_data =
+  //     ReadAccelerometer(error_reporter, model_input->data.f, input_length);
+  // // If there was no new data, wait until next time.
+  // if (!got_data) return;
+
+    // TF_LITE_REPORT_ERROR(error_reporter, "ee %d", data);
+  
+  // for (int i = count*111; i < count*111 + 110; i++) {
+  for (int i = 0; i < 110; i++)
+  {
+    //first row has 0.001 quantile, j is col
+    min_val = pgm_read_float(&quant_arr[i]);
+    //last row (5th) has 0.999 quantile, j is col
+    max_val = pgm_read_float(&quant_arr[i] + 110*4);
+
+    normed_data = (pgm_read_float(&data_arr[count*111 + i]) - min_val) / (max_val - min_val);
+
+    Serial.print(normed_data,6);
+    Serial.print(" ");
+
+    model_input->data.f[i] = normed_data;
+
     }
-    Serial.print("\n");
+    Serial.println(" ");
 
-  Serial.print("------\n");
-    for (int j=0; j < 110; j++){
+  // Run inference, and report any error.
+  TfLiteStatus invoke_status = interpreter->Invoke();
+  if (invoke_status != kTfLiteOk) {
+    TF_LITE_REPORT_ERROR(error_reporter, "Invoke failed on index: %d\n",
+                         begin_index);
+    return;
+  }
 
-      //first row has 0.001 quantile, j is col
-      min_val = pgm_read_float(&quant_arr[j]);
-      //last row (5th) has 0.999 quantile, j is col
-      max_val = pgm_read_float(&quant_arr[j] + 110*4);
-
-      normed_data = (pgm_read_float(&data_arr[j]) - min_val) / (max_val - min_val);
-      Serial.print(normed_data, 6);
-      Serial.print(", ");
-      // Serial.println(min_val);
-      // Serial.println(max_val);
-      // Serial.println(pgm_read_float(&data_arr[j]));
-      
-
+  float max_score;
+  int max_index;
+  for (int i = 0; i < label_count; ++i) {
+    float score = interpreter->output(0)->data.f[i];
+    if ((i == 0) || (score > max_score)) {
+      max_score = score;
+      max_index = i;
     }
-    Serial.print("\n");
+  }
+
+  if (count < 25){
+
+  Serial.println(count);
+  label = pgm_read_float(&data_arr[110] + count*111);
+  Serial.print(label, 6);
+  Serial.print(" ");
+  Serial.print(interpreter->output(0)->data.f[0], 6);
+  Serial.print(" ");
+  Serial.print(interpreter->output(0)->data.f[1], 6);
+  Serial.print(" ");
+  Serial.print(interpreter->output(0)->data.f[2], 6);
+  Serial.print(" ");
+  Serial.print(interpreter->output(0)->data.f[3], 6);
+  Serial.print(" | ");
+  Serial.print(max_score, 6);
+  Serial.print(" ");
+  Serial.println(max_index);
+
+  if(label != max_index){
+    incorrect_guesses++;
+  }
+  else{
+    correct_guesses++;
+  }
+
+  Serial.print(correct_guesses);
+  Serial.print(" ");
+  Serial.print(incorrect_guesses);
+  Serial.print(" ");
+  percent = correct_guesses / (incorrect_guesses+correct_guesses);
+  Serial.println(percent, 6);
 
 
+  count++;
+  }
+  else
+  {
+    count=0;
+    incorrect_guesses=0;
+    correct_guesses=0;
+
+  }
+
+
+  // Analyze the results to obtain a prediction
+  // int gesture_index = PredictGesture(interpreter->output(0)->data.f);
+
+  // Produce an output
+  // HandleOutput(error_reporter, gesture_index);
 }
-
-// void loop() {
-
-//   if (count == 100)
-//   {
-//     count=0;
-//   }
-//   else
-//   {
-//     count++;
-//   }
-//   // Attempt to read new data from the accelerometer.
-//   // bool got_data =
-//   //     ReadAccelerometer(error_reporter, model_input->data.f, input_length);
-//   // // If there was no new data, wait until next time.
-//   // if (!got_data) return;
-
-//   for (byte k = 0; k < 5; k++) {
-//     a = pgm_read_word_near(arr + k*8);
-//     Serial.println(a);
-//   }
-
-//     // TF_LITE_REPORT_ERROR(error_reporter, "ee %d", data);
-
-//   for (int i = 0; i < 110; ++i) {
-//       model_input->data.f[i] = arr[count][i];
-//     }
-
-//   // Run inference, and report any error.
-//   TfLiteStatus invoke_status = interpreter->Invoke();
-//   if (invoke_status != kTfLiteOk) {
-//     TF_LITE_REPORT_ERROR(error_reporter, "Invoke failed on index: %d\n",
-//                          begin_index);
-//     return;
-//   }
-
-//   int8_t max_score;
-//     int max_index;
-//     for (int i = 0; i < label_count; ++i) {
-//       const int8_t score = interpreter->output(0)->data.f[i];
-//       if ((i == 0) || (score > max_score)) {
-//         max_score = score;
-//         max_index = i;
-//       }
-//     }
-//   TF_LITE_REPORT_ERROR(error_reporter, "%d", arr[count][110]);
-//   TF_LITE_REPORT_ERROR(error_reporter, "scores: %d %d %d %d %d", count, interpreter->output(0)->data.f[0], interpreter->output(0)->data.f[1],
-//     interpreter->output(0)->data.f[2], interpreter->output(0)->data.f[3]);
-
-//   // Analyze the results to obtain a prediction
-//   // int gesture_index = PredictGesture(interpreter->output(0)->data.f);
-
-//   // Produce an output
-//   // HandleOutput(error_reporter, gesture_index);
-// }
