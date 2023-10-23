@@ -11,8 +11,10 @@ import time
 from tqdm import tqdm
 import shutil
 import warnings
+import random
 
 warnings.filterwarnings('ignore')
+
 
 def get_activity_df(df, percent):
     df0 = df.loc[df['Activity'] == 0]
@@ -48,10 +50,9 @@ def get_xy_numpy(df, x_features_columns, y_features_columns='Activity'):
 def build_1D_CNN(model_base_dir, model_name='1DCNN', num_sensors=11, num_features=10, num_outputs=4):
     """Builds a convolutional neural network in Keras."""
     model = tf.keras.Sequential([
-        tf.keras.layers.Conv1D(56, 3, activation='relu',
+        tf.keras.layers.Dropout(rate=0.5),
+        tf.keras.layers.Conv1D(45, 3, activation='relu',
                                input_shape=(num_sensors, num_features)),
-        tf.keras.layers.MaxPooling1D(2, 2),
-        tf.keras.layers.Conv1D(56, 3, activation='relu'),
         tf.keras.layers.MaxPooling1D(2, 2),
         tf.keras.layers.Flatten(),
         tf.keras.layers.Dense(784, activation='relu'),
@@ -109,7 +110,8 @@ def plot_cf(y_true, y_pred, title, save=False):
         plt.show()
         plt.cla()
     else:
-        plt.savefig('/home/ss26/Projects/Smart-Tools/progress/apr5/dim_returns/'+title+'.png', dpi=300)
+        plt.savefig(
+            '/home/ss26/Projects/Smart-Tools/progress/apr5/dim_returns/'+title+'.png', dpi=300)
         plt.cla()
     ax.cla()
     plt.cla()
@@ -120,62 +122,78 @@ def accuracy(y_true, y_pred):
     cm = cm.astype(float) / cm.sum(axis=1)[:, np.newaxis]
     return cm.diagonal()
 
-def plot_data_vs_acc(percents, accs):
+
+def plot_data_vs_acc(percents, accs, title):
     plt.cla()
-    plt.plot([percent*100 for percent in percents], [acc*100 for acc in accs], 'xg--')
-    plt.title(f"Test Accuracy vs Dataset volume - Yaskawa Data")
+    plt.plot([percent*100 for percent in percents],
+             [acc*100 for acc in accs], 'xg--')
+    plt.title(f"Test Accuracy vs Dataset volume - " + title)
     plt.xlabel("Percentage of Data (in %)")
     plt.ylabel("Accuracy (in %)")
-    plt.savefig("/home/ss26/Projects/Smart-Tools/progress/apr5/accs_vs_data.png", dpi=600)
+    # plt.savefig("/home/ss26/Projects/Smart-Tools/progress/apr5/accs_vs_data/" + title + ".png", dpi=600)
 
-def plot_data_vs_logloss(percents, lls):
+
+def plot_data_vs_logloss(percents, lls, title):
     plt.cla()
     plt.plot([percent*100 for percent in percents], lls, 'xm--')
-    plt.title(f"Log-Loss vs Dataset volume - Yaskawa Data")
+    plt.title(f"Log-Loss vs Dataset volume - " + title)
     plt.xlabel("Percentage of Data (in %)")
     plt.ylabel("Log Loss")
-    plt.savefig("/home/ss26/Projects/Smart-Tools/progress/apr5/lls_vs_data.png", dpi=600)
+    # plt.savefig("/home/ss26/Projects/Smart-Tools/progress/apr5/lls_vs_data/" + title + ".png", dpi=600)
 
 
-def main():
+def main(SEED):
+
     BATCH_SIZE = 64
     SHUFFLE_BUFFER_SIZE = 100
-    SUBJECTS = ['Burzin', 'Elena', 'Jose', 'Kathy', 'Pablo', 'Sandeep', 'Raul']
-    epochs = 50
-    
-    for subject in SUBJECTS:
-        subject = SUBJECTS[0]
 
-        # Yaswaka
-        val_df = pd.read_csv(
-            '/home/ss26/Projects/Smart-Tools/data/Human_Validate_Xy_Matrix.csv')
-        train_df = pd.read_csv(
+    epochs = 15
+
+    # Yaswaka
+    # train_df_yaskawa = pd.read_csv(
+        # '/home/ss26/Projects/Smart-Tools/data/Yaskawa_Train_Xy_Matrix.csv')
+    # val_df_yaskawa = pd.read_csv(
+    # '/home/ss26/Projects/Smart-Tools/data/Yaskawa_Validate_Xy_Matrix.csv')
+    # test_df_yaskawa = pd.read_csv(
+    # '/home/ss26/Projects/Smart-Tools/data/Yaskawa_Test_Xy_Matrix.csv')
+
+    # human
+    subjects = ['Burzin', 'Elena', 'Jose', 'Kathy', 'Pablo', 'Raul', 'Sandeep']
+
+    for subject in subjects:
+        train_df_human = pd.read_csv(
             '/home/ss26/Projects/Smart-Tools/data/Human_Train_Xy_Matrix.csv')
-        test_df = pd.read_csv(
-            f'/home/ss26/Projects/Smart-Tools/data/Human_{subject}_Test_Xy_Matrix.csv')
+        val_df_human = pd.read_csv(
+            '/home/ss26/Projects/Smart-Tools/data/Human_Validate_Xy_Matrix.csv')
+        test_df_human = pd.read_csv(
+            '/home/ss26/Projects/Smart-Tools/data/Human_' + subject + '_Test_Xy_Matrix.csv')
 
-        x_features_columns = [colname for colname in list(train_df) if colname not in [
+        x_features_columns = [colname for colname in list(train_df_human) if colname not in [
             'Unnamed: 0', 'Activity', 'Subject Number', 'Trial', 'Unnamed: 0.1']]
         y_features_columns = 'Activity'
-        data_percents = np.arange(0,1,0.05)
-        data_percents = data_percents[1:]
+        data_percents_human = np.arange(0, 1, 0.02)
+        data_percents_human = data_percents_human[1:]
 
         losses, accs, loglosses = [], [], []
-        
 
-        num_activities = len(set(test_df['Activity']))
+        num_activities = 4
 
-        for percent in tqdm(data_percents):
+        # title = f"Training: all humans, testing: {subject}], no pretraining (Seed: {SEED})"
+        title = f"Training: all humans, testing: {subject}], Yaskawa pretraining (Seed: {SEED})"
 
-            train_df_percent = get_activity_df(train_df, percent)
+        for percent in tqdm(data_percents_human):
+
+            train_df_human_percent = get_activity_df(train_df_human, percent)
+            # train_df_yaskawa_percent = get_activity_df(train_df_yaskawa, percent*(1/4))
             # val_df_percent = get_activity_df(val_df, percent)
             # test_df_percent = get_activity_df(test_df, percent)
 
             train_test_val_df_dict = OrderedDict()
-            train_test_val_df_dict['train'] = train_df_percent
-            train_test_val_df_dict['val'] = val_df
-            train_test_val_df_dict['test'] = test_df
-            
+            train_test_val_df_dict['train'] = train_df_human_percent
+            # train_test_val_df_dict['train'] = pd.concat([train_df_human_percent, train_df_yaskawa_percent], ignore_index=True)
+            train_test_val_df_dict['val'] = val_df_human
+            train_test_val_df_dict['test'] = test_df_human
+
             tf_dataset_dict = OrderedDict()
 
             # min, max, mean etc.
@@ -234,20 +252,25 @@ def main():
                 test_len += 1
 
             # 1D CNN model
-            base_dir = '/home/ss26/Projects/Smart-Tools/notebooks/outputs/subject_fine_tuning/no_pretrain/'
-            model_base_dir = base_dir + f'{subject}/model'
-            
+            base_dir = '/home/ss26/Projects/Smart-Tools/notebooks/outputs/subject_fine_tuning/pretrain/'
+            model_base_dir = base_dir + f'{subject}'
+
             if not os.path.isdir(model_base_dir):
                 os.makedirs(model_base_dir)
             else:
                 shutil.rmtree(model_base_dir)
 
-            model, model_path = build_1D_CNN(model_base_dir, model_name='1DCNN',
-                                            num_sensors=num_sensors, num_features=num_features, num_outputs=num_activities)
+            # no pretraining
+            # model, model_path = build_1D_CNN(model_base_dir, model_name='1DCNN',
+                # num_sensors=num_sensors, num_features=num_features, num_outputs=num_activities)
 
+            # pretrained model
+            model = tf.keras.models.load_model(
+                '/home/ss26/Projects/Smart-Tools/models/yaskawa_pretrained_dropout')
 
             # when we train, we save a csv of the training accuracy/loss
-            csv_logger = tf.keras.callbacks.CSVLogger(base_dir + '/training.log')
+            csv_logger = tf.keras.callbacks.CSVLogger(
+                base_dir + '/training.log')
 
             # how long we train, set up model with loss function
             # do 50 for convergence, do 5 to test code
@@ -261,13 +284,29 @@ def main():
                     validation_data=val_data,
                     callbacks=[csv_logger], verbose=0)
 
-            loss, acc, ll = get_preds(test_data, test_df, model, f'{percent*100}% of data')
+            loss, acc, ll = get_preds(
+                test_data, test_df_human, model, f'{percent*100}% of data')
             losses += [loss]
             accs += [acc]
             loglosses += [ll]
 
-    plot_data_vs_acc(data_percents, accs)
-    plot_data_vs_logloss(data_percents, loglosses)
+        # plot_data_vs_acc(data_percents_human, accs, title)
+        # plot_data_vs_logloss(data_percents_human, loglosses, title)
+
+        metrics = pd.DataFrame(list(zip(data_percents_human, accs, loglosses)), columns=[
+            "percent", "accuracy", "logloss"])
+        metrics.to_csv(
+            "/home/ss26/Projects/Smart-Tools/progress/apr5/" + title + ".csv")
+
+        print(f"Saved metrics of " + title + "!")
+
+        print("End of experiment")
+
 
 if __name__ == '__main__':
-    main()
+
+    SEEDS = [42, 43, 44, 45, 46]
+
+    for SEED in SEEDS:
+        tf.keras.utils.set_random_seed(SEED)
+        main(SEED)
