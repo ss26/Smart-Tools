@@ -1,5 +1,41 @@
 # Smart-Tools
 
+# Usage
+
+Download the data from the link provided below and put it in a folder called 'data'. The file tree should then look like:
+
+```
+.
+├── data
+│   ├── Human
+│   │   ├── Processed Data
+│   │   ├── Run_1_Samples
+│   │   ├── Run_2_Samples
+│   │   ├── Run_3_Samples
+│   │   ├── Run_4_Samples
+│   │   ├── Run_5_Samples
+│   │   ├── Run_6_Samples
+│   │   ├── Run_7_Samples
+│   │   ├── Run_8_Samples
+│   │   ├── Run_9_Samples
+│   │   └── Subject_5_different_tool
+│   ├── No Pretraining vs. Pretraining
+│   │   ├── Human trained + no pretraining (Seed: 42).csv
+│   │   ├── Human trained + no pretraining (Seed: 43).csv
+│   │   ├── Human trained + no pretraining (Seed: 44).csv
+│   │   ├── Human trained + no pretraining (Seed: 45).csv
+│   │   ├── Human trained + no pretraining (Seed: 46).csv
+│   │   ├── Human trained + Yaskawa pretraining (Seed: 42).csv
+│   │   ├── Human trained + Yaskawa pretraining (Seed: 43).csv
+│   │   ├── Human trained + Yaskawa pretraining (Seed: 44).csv
+│   │   ├── Human trained + Yaskawa pretraining (Seed: 45).csv
+│   │   └── Human trained + Yaskawa pretraining (Seed: 46).csv
+|   └── Yaskawa
+│       ├── Arduino_Yaskawa
+│       ├── Processed Data
+│       └── Raspberry_Yaskawa
+```
+
 # Data
 
 Raw data from accelerometer, gyroscope, magnetometer, current sensor and microphone are collected using an arduino. 
