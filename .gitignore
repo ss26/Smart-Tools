@@ -6,3 +6,7 @@ notebooks/outputs/
 notebooks/plots.ipynb
 notebooks/metrics.ipynb
 notebooks/split_data.ipynb
+scripts/Plot_ST_Data.py
+scripts/Data_Pre_Processing.py
+scripts/Current_Analysis_Example.py
+scripts/ArduinoDAQ.py

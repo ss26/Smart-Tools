@@ -1,3 +1,9 @@
+#!/usr/bin/python3
+
+"""
+Collect smart tools data from Arduino. 
+"""
+
 from ArduinoDAQ import SerialConnect
 import numpy as np
 

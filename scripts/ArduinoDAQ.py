@@ -1,3 +1,7 @@
+"""
+Collect Serial data from Arduino.
+"""
+
 import sys
 import serial
 import time
