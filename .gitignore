@@ -3,3 +3,6 @@ data/
 old-data/
 progress/
 notebooks/outputs/
+notebooks/plots.ipynb
+notebooks/metrics.ipynb
+notebooks/split_data.ipynb
