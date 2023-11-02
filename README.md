@@ -42,7 +42,7 @@ Raw data from accelerometer, gyroscope, magnetometer, current sensor and microph
 
 Here's the link for both human and robot data. 
 
-Source: [Drive link](https://utexas.box.com/s/ail8mdlvn97gygzu6eefn3nr0un53v46).
+Source: [Box link](https://utexas.box.com/s/ail8mdlvn97gygzu6eefn3nr0un53v46).
 
 ## Raw data from human subjects 
 
@@ -68,9 +68,9 @@ Once the data is collected and stored into separate `.csv` files, it is cleaned 
 - [X] Rename Tree - Level 2 folders (anonymize subjects)
 - [ ] Add scripts to run each plot
   - [X] data vs accuracy
-  - [ ] sensor comparisons
-  - [ ] id ood barplot
+  - [x] sensor comparisons
+  - [x] id ood barplot
 - [ ] Write meaning of each column in the data in README
-- [ ] Add comments in the code
+- [x] Add comments in the code
 
  
