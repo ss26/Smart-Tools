@@ -1,3 +1,7 @@
+"""
+    Calculate how the test accuracy varies with the percentage of training data.
+"""
+
 import pandas as pd
 import os
 from collections import OrderedDict
@@ -7,16 +11,17 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import log_loss
 import seaborn as sns
 import matplotlib.pyplot as plt
-import time
 from tqdm import tqdm
 import shutil
-import warnings
-import random
 
+import warnings
 warnings.filterwarnings('ignore')
 
 
 def get_activity_df(df, percent):
+    """
+        Get the dataframes for separate activities 0, 1, 2, and 3
+    """
     df0 = df.loc[df['Activity'] == 0]
     df1 = df.loc[df['Activity'] == 1]
     df2 = df.loc[df['Activity'] == 2]
@@ -35,6 +40,9 @@ def get_activity_df(df, percent):
 
 
 def get_xy_numpy(df, x_features_columns, y_features_columns='Activity'):
+    """
+        Get the X and Y as numpy arrays
+    """
     x_df = df[x_features_columns]
     x_np = x_df.to_numpy()
     # get the output column we want to predict
@@ -48,7 +56,9 @@ def get_xy_numpy(df, x_features_columns, y_features_columns='Activity'):
 
 
 def build_1D_CNN(model_base_dir, model_name='1DCNN', num_sensors=11, num_features=10, num_outputs=4):
-    """Builds a convolutional neural network in Keras."""
+    """
+        Builds a convolutional neural network in Keras.    
+    """
     model = tf.keras.Sequential([
         tf.keras.layers.Dropout(rate=0.5),
         tf.keras.layers.Conv1D(45, 3, activation='relu',
@@ -70,6 +80,9 @@ def build_1D_CNN(model_base_dir, model_name='1DCNN', num_sensors=11, num_feature
 
 
 def calculate_model_size(model):
+    """
+        For deployment on TensorFlowLite (tinyML)
+    """
     print(model.summary())
     var_sizes = [
         np.product(list(map(int, v.shape))) * v.dtype.size
@@ -82,6 +95,9 @@ def calculate_model_size(model):
 
 
 def get_preds(test_data, test_df: pd.DataFrame, model, title):
+    """
+        Get predictions to make plotting easier. 
+    """
     x = np.concatenate([x for x, y in test_data], axis=0)
     y = np.concatenate([y for x, y in test_data], axis=0)
 
@@ -98,6 +114,9 @@ def get_preds(test_data, test_df: pd.DataFrame, model, title):
 
 
 def plot_cf(y_true, y_pred, title, save=False):
+    """
+        Plot the confusion matrices and save as figure.
+    """
     cm = confusion_matrix(y_true, y_pred)
     ax = sns.heatmap(cm, annot=True, fmt='g')
     ax.set_title(title)
@@ -118,12 +137,18 @@ def plot_cf(y_true, y_pred, title, save=False):
 
 
 def accuracy(y_true, y_pred):
+    """
+        Calculate accuracy given ground truth and prediction.
+    """
     cm = confusion_matrix(y_true, y_pred)
     cm = cm.astype(float) / cm.sum(axis=1)[:, np.newaxis]
     return cm.diagonal()
 
 
 def plot_data_vs_acc(percents, accs, title):
+    """
+        Make the test accuracy versus data plot and save as figure.
+    """
     plt.cla()
     plt.plot([percent*100 for percent in percents],
              [acc*100 for acc in accs], 'xg--')
@@ -134,6 +159,10 @@ def plot_data_vs_acc(percents, accs, title):
 
 
 def plot_data_vs_logloss(percents, lls, title):
+    """ 
+        Make the logloss versus data plot and save as figure. 
+        Not needed for paper as logloss <=> test accuracy.
+    """
     plt.cla()
     plt.plot([percent*100 for percent in percents], lls, 'xm--')
     plt.title(f"Log-Loss vs Dataset volume - " + title)
@@ -146,6 +175,7 @@ def main(SEED):
 
     BATCH_SIZE = 64
     SHUFFLE_BUFFER_SIZE = 100
+    ROOT_FOLDER = os.path.abspath(os.curdir)
 
     epochs = 15
 
@@ -158,16 +188,12 @@ def main(SEED):
     # '/home/ss26/Projects/Smart-Tools/data/Yaskawa_Test_Xy_Matrix.csv')
 
     # human
-    subjects = ['Burzin', 'Elena', 'Jose', 'Kathy', 'Pablo', 'Raul', 'Sandeep']
+    subjects = ['0', '1', '2', '3', '4', '5', '6', '7']
+    train_df_human = pd.read_csv(ROOT_FOLDER + "data/F2021_Human_Train.csv")
+    val_df_human = pd.read_csv(ROOT_FOLDER + "data/F2021_Human_Validate.csv")
 
     for subject in subjects:
-        train_df_human = pd.read_csv(
-            '/home/ss26/Projects/Smart-Tools/data/Human_Train_Xy_Matrix.csv')
-        val_df_human = pd.read_csv(
-            '/home/ss26/Projects/Smart-Tools/data/Human_Validate_Xy_Matrix.csv')
-        test_df_human = pd.read_csv(
-            '/home/ss26/Projects/Smart-Tools/data/Human_' + subject + '_Test_Xy_Matrix.csv')
-
+        test_df_human = pd.read_csv(ROOT_FOLDER + "data/F2021_Human_{subject}_Test.csv")
         x_features_columns = [colname for colname in list(train_df_human) if colname not in [
             'Unnamed: 0', 'Activity', 'Subject Number', 'Trial', 'Unnamed: 0.1']]
         y_features_columns = 'Activity'
@@ -224,7 +250,7 @@ def main(SEED):
                     normalized_data_x_df[feature_name] = (
                         data_x_df[feature_name] - min_value) / (max_value - min_value)
 
-            # now actually transform the training data
+                # now actually transform the training data
                 data_x_np_scaled = normalized_data_x_df.to_numpy()
 
                 # BATCH_SIZE x NUM_SENSORS x NUM_FEATURES
@@ -252,7 +278,9 @@ def main(SEED):
                 test_len += 1
 
             # 1D CNN model
-            base_dir = '/home/ss26/Projects/Smart-Tools/notebooks/outputs/subject_fine_tuning/pretrain/'
+
+            # save for subject fine tuning
+            base_dir = ROOT_FOLDER + '/models/subject_fine_tuning/pretrain/'
             model_base_dir = base_dir + f'{subject}'
 
             if not os.path.isdir(model_base_dir):
@@ -260,13 +288,14 @@ def main(SEED):
             else:
                 shutil.rmtree(model_base_dir)
 
+            # do one of no pretraining or pretraining
+            
             # no pretraining
             # model, model_path = build_1D_CNN(model_base_dir, model_name='1DCNN',
                 # num_sensors=num_sensors, num_features=num_features, num_outputs=num_activities)
 
-            # pretrained model
-            model = tf.keras.models.load_model(
-                '/home/ss26/Projects/Smart-Tools/models/yaskawa_pretrained_dropout')
+            # use pretrained model
+            model = tf.keras.models.load_model(ROOT_FOLDER + '/models/yaskawa_pretrained_dropout')
 
             # when we train, we save a csv of the training accuracy/loss
             csv_logger = tf.keras.callbacks.CSVLogger(
@@ -295,8 +324,7 @@ def main(SEED):
 
         metrics = pd.DataFrame(list(zip(data_percents_human, accs, loglosses)), columns=[
             "percent", "accuracy", "logloss"])
-        metrics.to_csv(
-            "/home/ss26/Projects/Smart-Tools/progress/apr5/" + title + ".csv")
+        metrics.to_csv( + title + ".csv")
 
         print(f"Saved metrics of " + title + "!")
 
